@@ -1,0 +1,4 @@
+name: zombies
+version: '${version}'
+main: com.github.bun133.guilib.zombies.Zombies
+api-version: 1.16
