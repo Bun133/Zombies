@@ -5,8 +5,9 @@ import org.bukkit.Location
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Villager
 
-class Trader(plugin: Zombies, location: Location, val tradings: List<Trading>) {
+class Trader(plugin: Zombies, location: Location) {
     val entity: Villager
+    val trading = tradings
 
     init {
         entity = location.world.spawnEntity(location, EntityType.VILLAGER) as Villager

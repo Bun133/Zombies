@@ -12,6 +12,7 @@ import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Instrument
 import org.bukkit.Note
 import org.bukkit.entity.Player
+import org.bukkit.entity.Villager
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageEvent
@@ -19,13 +20,25 @@ import org.bukkit.event.entity.EntityDeathEvent
 import org.bukkit.event.player.PlayerInteractAtEntityEvent
 
 class TraderHandler(private val plugin: Zombies) : Listener {
-    init {
-        plugin.server.pluginManager.registerEvents(this, plugin)
-    }
-
     private val traders = mutableListOf<Trader>()
+
     fun register(trader: Trader) {
         traders.add(trader)
+        plugin.config.traderLocationList.add(trader.entity.location)
+    }
+
+    init {
+        plugin.server.pluginManager.registerEvents(this, plugin)
+
+        plugin.server.scheduler.runTaskLater(plugin, Runnable {
+            plugin.logger.info("traderLocationList${plugin.config.traderLocationList.toList().size}")
+            plugin.config.traderLocationList.toList().forEach {
+                it.getNearbyEntitiesByType(Villager::class.java, 1.0).forEach {v ->
+                    v.remove()
+                }
+                traders.add(Trader(plugin, it))
+            }
+        },10L)   // lateinitをごまかす
     }
 
     @EventHandler
@@ -47,12 +60,16 @@ class TraderHandler(private val plugin: Zombies) : Listener {
             } else {
                 // Cant Afford
                 player.sendMessage(Component.text("レベルが足りません！").color(NamedTextColor.RED))
-                player.playNote(player.location, Instrument.PLING, Note.natural(1, Note.Tone.E))
+                player.playNote(
+                    player.location,
+                    Instrument.PLING,
+                    Note.natural(1, Note.Tone.E)
+                )    // TODO 他の人にも聞こえるのをどうにかする
             }
         }
 
 
-        val items = trader.tradings.mapIndexed { index: Int, trading: Trading ->
+        val items = trader.trading.mapIndexed { index: Int, trading: Trading ->
             val x = index % 9 + 1
             val y = index / 9 + 1
 
@@ -81,7 +98,7 @@ class TraderHandler(private val plugin: Zombies) : Listener {
     }
 
     @EventHandler
-    fun onDeath(e:EntityDeathEvent){
+    fun onDeath(e: EntityDeathEvent) {
         if (e.entity in traders.map { it.entity }) {
             e.isCancelled = true
         }

@@ -29,7 +29,7 @@ class TraderCommand(val plugin: Zombies) : Command("trader"), Listener {
     fun onClick(e: PlayerInteractAtEntityEvent) {
         if (e.player in players && e.rightClicked.type == EntityType.VILLAGER) {
             // Register clicked entity as Trader
-            plugin.trader.register(Trader(plugin, e.rightClicked.location, tradings))
+            Trader(plugin, e.rightClicked.location)
             e.rightClicked.remove()
 
             players.remove(e.player)
