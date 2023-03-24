@@ -16,6 +16,9 @@ class ZombiesConfig(plugin: JavaPlugin) : BaseConfig(plugin) {
     // Spawnerからこのブロック以内に人がいたらActiveとしてマークする
     val activeRange = DoubleValue(9.0)
 
+    //. SpawnerがActiveになる最高光度
+    val activeLight = IntegerValue(13)
+
     // BottomThresholdの増加割合
     val multiplier = DoubleValue(1.1)
 

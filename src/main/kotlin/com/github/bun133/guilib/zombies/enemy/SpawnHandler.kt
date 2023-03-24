@@ -97,7 +97,8 @@ class SpawnHandler(val plugin: Zombies) : Listener {
             it.getNearbyEntitiesByType(
                 Player::class.java,
                 plugin.config.activeRange.value()
-            ).isNotEmpty()
+            ).isNotEmpty() &&
+                    it.block.lightLevel <= plugin.config.activeLight.value()
         }
     }
 
