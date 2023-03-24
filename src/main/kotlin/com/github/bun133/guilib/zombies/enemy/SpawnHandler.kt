@@ -1,6 +1,7 @@
 package com.github.bun133.guilib.zombies.enemy
 
 import com.github.bun133.guilib.zombies.Zombies
+import com.github.bun133.guilib.zombies.randomize
 import org.bukkit.Location
 import org.bukkit.attribute.Attribute
 import org.bukkit.entity.LivingEntity
@@ -14,7 +15,7 @@ import kotlin.math.pow
 class SpawnHandler(val plugin: Zombies) : Listener {
     init {
         plugin.server.pluginManager.registerEvents(this, plugin)
-        plugin.server.scheduler.runTaskTimer(plugin, Runnable { sec() }, 0L, 20L)
+        plugin.server.scheduler.runTaskTimer(plugin, Runnable { sec() }, 0L, 20L * plugin.config.spawnSec.value())
     }
 
     private val entities = mutableListOf<Pair<Enemy, LivingEntity>>()
@@ -26,7 +27,7 @@ class SpawnHandler(val plugin: Zombies) : Listener {
      * Tick関数(20Tickおき)
      */
     private fun sec() {
-        if(listActiveSpawner().isEmpty()){
+        if (listActiveSpawner().isEmpty()) {
             plugin.logger.info("No Active Spawner!")
             return
         }
@@ -35,12 +36,15 @@ class SpawnHandler(val plugin: Zombies) : Listener {
         if (remainCost < bottomThreshold) {
             plugin.logger.info("Spawning! Remain:${remainCost} Threshold:${bottomThreshold}")
             spawnNew(remainCost)
+            updateBottomThreshold()
         }
     }
 
+    private fun updateBottomThreshold() {
+        bottomThreshold = (bottomThreshold * plugin.config.multiplier.value()).toInt()
+    }
 
-    // コストが高いのが上になっているリスト
-    private val costSortedEnemy = Enemy.values().groupBy { it.data.cost }.entries.sortedBy { it.key }.reversed()
+
     private fun spawnNew(remainCost: Int) {
         // このスポーンでどこまでスポーンするか
         val target = bottomThreshold * Math.E.pow(log10(bottomThreshold / 10.0))
@@ -57,7 +61,7 @@ class SpawnHandler(val plugin: Zombies) : Listener {
 
             val spawner = activeSpawner.getOrNull(spawnerIndex)
             if (spawner != null) {
-                spawnEnemy(it, spawner)
+                spawnEnemy(it, spawner.randomize(1.5))
             }
             spawnerIndex++
         }
@@ -67,12 +71,15 @@ class SpawnHandler(val plugin: Zombies) : Listener {
     private fun generateSpawnSet(toSpawn: Int): List<Enemy> {
         var target = toSpawn
         val toSpawnEnemies = mutableListOf<Enemy>()
-        for (e in costSortedEnemy) {
-            while (target >= e.key) {
-                toSpawnEnemies.add(e.value.random())
-                target -= e.key
-            }
-        }
+
+        var possible = Enemy.values().filter { it.data.cost <= target }
+        do {
+            val chosen = possible.random()
+            target -= chosen.data.cost
+            toSpawnEnemies.add(chosen)
+
+            possible = Enemy.values().filter { it.data.cost <= target }
+        } while (possible.isNotEmpty())
 
         return toSpawnEnemies
     }
