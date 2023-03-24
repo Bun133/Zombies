@@ -115,7 +115,7 @@ class SpawnHandler(val plugin: Zombies) : Listener {
             }
         }
 
-        plugin.ai.setAI(spawned)
+        plugin.ai.setAI(spawned,enemy.ai)
         entities.add(enemy to spawned)
     }
 

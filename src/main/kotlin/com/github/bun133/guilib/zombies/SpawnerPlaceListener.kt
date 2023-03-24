@@ -4,6 +4,7 @@ import net.kyori.adventure.text.Component
 import org.bukkit.Material
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockPlaceEvent
 
 class SpawnerPlaceListener(val plugin: Zombies) : Listener {
@@ -16,6 +17,14 @@ class SpawnerPlaceListener(val plugin: Zombies) : Listener {
         if (e.blockPlaced.type == Material.SPAWNER) {
             plugin.config.spawnerLocationList.add(e.blockPlaced.location)
             e.player.sendMessage(Component.text("スポナーを登録しました"))
+        }
+    }
+
+    @EventHandler
+    fun onBreak(e: BlockBreakEvent) {
+        if (e.block.type == Material.SPAWNER) {
+            plugin.config.spawnerLocationList.remove(e.block.location)
+            e.player.sendMessage(Component.text("スポナーを登録解除しました"))
         }
     }
 }

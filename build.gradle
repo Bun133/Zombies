@@ -18,10 +18,15 @@ repositories {
         url = "https://oss.sonatype.org/content/groups/public/"
     }
     maven { url 'https://jitpack.io' }
+    maven {
+        name "spigot-repo"
+        url "https://hub.spigotmc.org/nexus/content/repositories/snapshots"
+    }
 }
 
 dependencies {
     compileOnly "com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT"
+    compileOnly files("run/cache/patched_1.16.5.jar")
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     implementation "com.github.TeamKun.CommandLib:bukkit:0.12.4"
     implementation 'com.github.TeamKun.ConfigLib:bukkit:0.16.2'
