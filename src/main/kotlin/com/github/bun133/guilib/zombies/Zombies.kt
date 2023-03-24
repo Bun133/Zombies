@@ -26,6 +26,8 @@ class Zombies : JavaPlugin() {
         spawn = SpawnHandler(this)
         kill = KillHandler(this)
         trader = TraderHandler(this)
+
+        SpawnerPlaceListener(this)
     }
 
     override fun onDisable() {
