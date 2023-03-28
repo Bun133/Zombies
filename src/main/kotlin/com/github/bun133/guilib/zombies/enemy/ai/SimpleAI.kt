@@ -43,6 +43,10 @@ private class TargetGoal(private val entity: EntityInsentient, range: Double, fi
 }
 
 private class MoveTowardTargetGoal(private val entity: EntityInsentient) : PathfinderGoal() {
+    init {
+        a(EnumSet.of(Type.MOVE))
+    }
+
     /**
      * このGoalが実行可能か
      */
@@ -56,6 +60,6 @@ private class MoveTowardTargetGoal(private val entity: EntityInsentient) : Pathf
     override fun e() {
         val target = entity.goalTarget!!
         entity.a(target, 10.0F, 10.0F)
-        entity.controllerMove.a(entity.locX(), entity.locY(), entity.locZ(), 1.0)
+        entity.controllerMove.a(target.locX(), target.locY(), target.locZ(), 1.0)
     }
 }
