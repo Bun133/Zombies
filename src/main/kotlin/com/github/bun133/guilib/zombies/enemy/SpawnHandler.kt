@@ -3,12 +3,17 @@ package com.github.bun133.guilib.zombies.enemy
 import com.github.bun133.guilib.zombies.Zombies
 import com.github.bun133.guilib.zombies.randomize
 import org.bukkit.Location
+import org.bukkit.World
 import org.bukkit.attribute.Attribute
+import org.bukkit.craftbukkit.v1_16_R3.CraftWorld
+import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.entity.CreatureSpawnEvent
 import org.bukkit.event.entity.SpawnerSpawnEvent
+import org.bukkit.util.Consumer
 import kotlin.math.log10
 import kotlin.math.pow
 
@@ -109,19 +114,28 @@ class SpawnHandler(val plugin: Zombies) : Listener {
 
     fun spawnEnemy(enemy: Enemy, loc: Location) {
         val enemyData = enemy.data
-        val spawned = when (enemyData) {
+        val created = when (enemyData) {
             is EnemyData.Normal -> {
-                handleNormal(enemyData, loc)
+                createEntity(loc, enemyData.entityType.entityClass!!)
+            }
+        }
+        // setAI
+        plugin.ai.setAI(created, enemy.ai)
+
+        // Spawn
+        val spawned = addEntity(created, loc.world)
+
+        when (enemyData) {
+            is EnemyData.Normal -> {
+                handleNormal(enemyData, spawned)
             }
         }
 
-        plugin.ai.setAI(spawned,enemy.ai)
-        entities.add(enemy to spawned)
+        entities.add(enemy to (spawned as LivingEntity))
     }
 
-    private fun handleNormal(data: EnemyData.Normal, loc: Location): LivingEntity {
+    private fun handleNormal(data: EnemyData.Normal, entity: Entity): LivingEntity {
         plugin.logger.info("handleNormal")
-        val entity = loc.world.spawnEntity(loc, data.entityType)
         if (entity !is LivingEntity) throw Error("#handleNormal is not able to handle spawning non-living entity")
 
         entity.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.baseValue = data.health
@@ -132,5 +146,26 @@ class SpawnHandler(val plugin: Zombies) : Listener {
         entity.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS)!!.baseValue = data.defence
 
         return entity
+    }
+
+    private fun <E : Entity> createEntity(loc: Location, clazz: Class<E>): net.minecraft.server.v1_16_R3.Entity {
+        val createEntity = CraftWorld::class.java.getMethod("createEntity", Location::class.java, Class::class.java)
+        createEntity.isAccessible = true
+        return createEntity.invoke(loc.world, loc, clazz) as net.minecraft.server.v1_16_R3.Entity
+    }
+
+    private fun addEntity(entity: net.minecraft.server.v1_16_R3.Entity, world: World): org.bukkit.entity.Entity {
+        val addEntity = CraftWorld::class.java.getMethod(
+            "addEntity",
+            net.minecraft.server.v1_16_R3.Entity::class.java,
+            CreatureSpawnEvent.SpawnReason::class.java,
+            Consumer::class.java
+        )
+        addEntity.isAccessible = true
+        return addEntity.invoke(
+            world,
+            entity,
+            CreatureSpawnEvent.SpawnReason.CUSTOM,
+            Consumer<Entity> {}) as org.bukkit.entity.Entity
     }
 }
