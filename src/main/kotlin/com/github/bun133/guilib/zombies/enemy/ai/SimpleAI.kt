@@ -4,7 +4,7 @@ import net.minecraft.server.v1_16_R3.*
 import org.bukkit.event.entity.EntityTargetEvent
 import java.util.*
 
-class SimpleAI : AI {
+class SimpleAI : AI<EntityCreature>(EntityCreature::class.java) {
     override fun attach(entity: EntityCreature) {
         //TODO
         entity.targetSelector.a(0, TargetGoal(entity, 20.0) { true })

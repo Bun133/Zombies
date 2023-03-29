@@ -3,28 +3,33 @@ package com.github.bun133.guilib.zombies.enemy
 import com.github.bun133.guilib.zombies.Zombies
 import com.github.bun133.guilib.zombies.enemy.ai.AI
 import com.google.common.collect.Sets
-import net.minecraft.server.v1_16_R3.Entity
-import net.minecraft.server.v1_16_R3.EntityCreature
 import net.minecraft.server.v1_16_R3.EntityInsentient
 import net.minecraft.server.v1_16_R3.PathfinderGoalSelector
 import net.minecraft.server.v1_16_R3.PathfinderGoalWrapped
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftLivingEntity
-import org.bukkit.entity.LivingEntity
 
 class AIHandler(val zombies: Zombies) {
     /**
-     * 敵のEntityにお手製のAIをセット
+     * Safely Attach AI to type-unknown entity,
+     * @return true - correctly attached,false - failed to attach.
      */
-    fun setAI(entity: Entity, ai: AI) {
-        setAI(entity as EntityInsentient, ai)
+    fun safeSetAI(entity: EntityInsentient, ai: AI<*>): Boolean {
+        return if (ai.canAssign(entity)) {
+            clearDefaultAI(entity)
+            zombies.logger.info("Attaching AI Safely")
+            ai.forceAttach(entity)
+            true
+        } else {
+            false
+        }
     }
 
-    private fun setAI(entity: EntityInsentient, ai: AI) {
-        if(entity is EntityCreature){
-            clearDefaultAI(entity)
-            zombies.logger.info("Attaching AI")
-            ai.attach(entity)
-        }
+    /**
+     * 敵のEntityにお手製のAIをセット
+     */
+    fun <E : EntityInsentient> setAI(entity: E, ai: AI<E>) {
+        clearDefaultAI(entity)
+        zombies.logger.info("Attaching AI")
+        ai.attach(entity)
     }
 
     private fun clearDefaultAI(e: EntityInsentient) {

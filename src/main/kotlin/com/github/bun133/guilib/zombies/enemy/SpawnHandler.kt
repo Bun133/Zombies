@@ -2,6 +2,7 @@ package com.github.bun133.guilib.zombies.enemy
 
 import com.github.bun133.guilib.zombies.Zombies
 import com.github.bun133.guilib.zombies.randomize
+import net.minecraft.server.v1_16_R3.EntityInsentient
 import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.attribute.Attribute
@@ -116,11 +117,15 @@ class SpawnHandler(val plugin: Zombies) : Listener {
         val enemyData = enemy.data
         val created = when (enemyData) {
             is EnemyData.Normal -> {
-                createEntity(loc, enemyData.entityType.entityClass!!)
+                createEntity(loc, enemyData.entityType.entityClass!!) as EntityInsentient
             }
         }
+
         // setAI
-        plugin.ai.setAI(created, enemy.ai)
+        if (!plugin.ai.safeSetAI(created, enemy.ai)) {
+            // Failed to Set AI
+            plugin.logger.warning("Failed to Set AI,Entity:${created},Enemy AI:${enemy.ai}")
+        }
 
         // Spawn
         val spawned = addEntity(created, loc.world)
