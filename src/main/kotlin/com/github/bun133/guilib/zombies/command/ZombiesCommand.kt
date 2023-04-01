@@ -6,6 +6,11 @@ import net.kunmc.lab.configlib.ConfigCommandBuilder
 
 class ZombiesCommand(plugin: Zombies) : Command("zombies") {
     init {
-        addChildren(ConfigCommandBuilder(plugin.config).build(), TraderCommand(plugin))
+        addChildren(
+            ConfigCommandBuilder(plugin.config).build(),
+            TraderCommand(plugin),
+            SpawnCommand(plugin),
+            ThresholdCommand(plugin)
+        )
     }
 }

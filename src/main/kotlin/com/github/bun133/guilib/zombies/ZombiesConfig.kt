@@ -19,8 +19,11 @@ class ZombiesConfig(plugin: JavaPlugin) : BaseConfig(plugin) {
     //. SpawnerがActiveになる最高光度
     val activeLight = IntegerValue(13)
 
+    // BottomThresholdの初期値
+    val initialThreshold = IntegerValue(10)
+
     // BottomThresholdの増加割合
-    val multiplier = DoubleValue(1.1)
+    val multiplier = DoubleValue(1.01)
 
     // スポーンの頻度
     val spawnSec = IntegerValue(15)

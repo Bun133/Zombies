@@ -26,9 +26,17 @@ class SpawnHandler(val plugin: Zombies) : Listener {
 
     private val entities = mutableListOf<Pair<Enemy, LivingEntity>>()
 
-    // remainCostがこの値を下回ったら、新しくスポーンさせる
-    private var bottomThreshold = 10
+    fun forceUpdateBottomThreshold(new: Int) {
+        bottomThreshold = new
+    }
 
+    // remainCostがこの値を下回ったら、新しくスポーンさせる
+    private var bottomThreshold = plugin.config.initialThreshold.value()
+
+
+    fun forceFireTick(){
+        sec()
+    }
     /**
      * Tick関数(20Tickおき)
      */
