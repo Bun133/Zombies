@@ -121,12 +121,6 @@ class SpawnHandler(val plugin: Zombies) : Listener {
             }
         }
 
-        // setAI
-        if (!plugin.ai.safeSetAI(created, enemy.ai)) {
-            // Failed to Set AI
-            plugin.logger.warning("Failed to Set AI,Entity:${created},Enemy AI:${enemy.ai}")
-        }
-
         // Spawn
         val spawned = addEntity(created, loc.world)
 
