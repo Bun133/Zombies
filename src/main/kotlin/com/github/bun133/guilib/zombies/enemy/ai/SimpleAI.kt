@@ -12,7 +12,7 @@ class SimpleAI : AI<EntityCreature>(EntityCreature::class.java) {
     }
 }
 
-private class TargetGoal(private val entity: EntityInsentient, range: Double, filter: (EntityLiving) -> Boolean) :
+class TargetGoal(private val entity: EntityInsentient, range: Double, filter: (EntityLiving) -> Boolean) :
     PathfinderGoalTarget(entity, true) {
     private var target: EntityHuman? = null
     private val condition = PathfinderTargetCondition().apply {
@@ -42,24 +42,41 @@ private class TargetGoal(private val entity: EntityInsentient, range: Double, fi
     }
 }
 
-private class MoveTowardTargetGoal(private val entity: EntityInsentient) : PathfinderGoal() {
+class MoveTowardTargetGoal(private val entity: EntityInsentient, private val speed: Double = 1.0) : PathfinderGoal() {
     init {
         a(EnumSet.of(Type.MOVE))
     }
+
+    private var path: PathEntity? = null
 
     /**
      * このGoalが実行可能か
      */
     override fun a(): Boolean {
-        val target = entity.goalTarget
-        val b =
-            entity.isOnGround && target != null && target is EntityHuman && target.isAlive && !target.abilities.isInvulnerable
+        val target = entity.goalTarget ?: return false
+        path = entity.navigation.a(target, 0)
+        val b = path != null && target.isAlive && !target.isInvulnerable
+        println("Move ${if(b)"will start" else "will not start"}")
         return b
+    }
+
+    override fun c() {
+        println("Move Start")
+        // Pathに沿って進むように設定
+        entity.navigation.a(path!!, speed)
+        // おこだぞ
+        entity.isAggressive = true
     }
 
     override fun e() {
         val target = entity.goalTarget!!
+        // 見つめる
         entity.a(target, 10.0F, 10.0F)
-        entity.controllerMove.a(target.locX(), target.locY(), target.locZ(), 1.0)
+//        entity.controllerMove.a(target.locX(), target.locY(), target.locZ(), speed)
+    }
+
+    override fun d() {
+        println("Move End")
+        entity.navigation.o()
     }
 }

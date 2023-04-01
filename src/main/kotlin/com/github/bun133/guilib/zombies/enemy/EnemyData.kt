@@ -1,6 +1,7 @@
 package com.github.bun133.guilib.zombies.enemy
 
 import com.github.bun133.guilib.zombies.enemy.ai.AI
+import com.github.bun133.guilib.zombies.enemy.ai.AttackAI
 import com.github.bun133.guilib.zombies.enemy.ai.SimpleAI
 import org.bukkit.entity.Entity
 import org.bukkit.entity.EntityType
@@ -28,8 +29,8 @@ sealed class EnemyData {
 }
 
 enum class Enemy(val data: EnemyData, val ai: AI<*>) {
-    Zombie(EnemyData.Normal(EntityType.ZOMBIE, 10.0, 1.0, 1.0, 1), SimpleAI()),
-    Skeleton(EnemyData.Normal(EntityType.SKELETON, 10.0, 2.0, 1.0, 3), SimpleAI());
+    Zombie(EnemyData.Normal(EntityType.ZOMBIE, 10.0, 1.0, 1.0, 1), AttackAI()),
+    Skeleton(EnemyData.Normal(EntityType.SKELETON, 10.0, 2.0, 1.0, 3), AttackAI());
 
     companion object {
         fun inferEnemy(entity: Entity): Enemy? {
