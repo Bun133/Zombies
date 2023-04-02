@@ -1,5 +1,6 @@
 package com.github.bun133.guilib.zombies.enemy.ai
 
+import com.github.bun133.guilib.zombies.Zombies
 import net.minecraft.server.v1_16_R3.EntityCreature
 import net.minecraft.server.v1_16_R3.EnumHand
 import net.minecraft.server.v1_16_R3.PathEntity
@@ -7,7 +8,7 @@ import net.minecraft.server.v1_16_R3.PathfinderGoal
 import java.util.*
 
 class AttackAI : AI<EntityCreature>(EntityCreature::class.java) {
-    override fun attach(entity: EntityCreature) {
+    override fun attach(entity: EntityCreature, plugin: Zombies) {
         entity.targetSelector.a(0, TargetGoal(entity, 20.0) { true })
 
         entity.goalSelector.a(0, AttackTargetGoal(entity, 1.0, 20))

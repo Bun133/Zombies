@@ -3,6 +3,7 @@ package com.github.bun133.guilib.zombies
 import net.kunmc.lab.configlib.BaseConfig
 import net.kunmc.lab.configlib.value.DoubleValue
 import net.kunmc.lab.configlib.value.IntegerValue
+import net.kunmc.lab.configlib.value.LocationValue
 import net.kunmc.lab.configlib.value.collection.LocationSetValue
 import org.bukkit.plugin.java.JavaPlugin
 
@@ -27,4 +28,7 @@ class ZombiesConfig(plugin: JavaPlugin) : BaseConfig(plugin) {
 
     // スポーンの頻度
     val spawnSec = IntegerValue(15)
+
+    // Target Location
+    val targetLocation = LocationValue()
 }

@@ -129,6 +129,12 @@ class SpawnHandler(val plugin: Zombies) : Listener {
             }
         }
 
+        // setAI
+        if (!plugin.ai.safeSetAI(created, enemy.ai)) {
+            // Failed to Set AI
+            plugin.logger.warning("Failed to Set AI,Entity:${created},Enemy AI:${enemy.ai}")
+        }
+
         // Spawn
         val spawned = addEntity(created, loc.world)
 
@@ -142,7 +148,6 @@ class SpawnHandler(val plugin: Zombies) : Listener {
     }
 
     private fun handleNormal(data: EnemyData.Normal, entity: Entity): LivingEntity {
-        plugin.logger.info("handleNormal")
         if (entity !is LivingEntity) throw Error("#handleNormal is not able to handle spawning non-living entity")
 
         entity.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.baseValue = data.health

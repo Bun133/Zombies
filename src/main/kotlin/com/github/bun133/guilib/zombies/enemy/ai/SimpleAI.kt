@@ -1,11 +1,12 @@
 package com.github.bun133.guilib.zombies.enemy.ai
 
+import com.github.bun133.guilib.zombies.Zombies
 import net.minecraft.server.v1_16_R3.*
 import org.bukkit.event.entity.EntityTargetEvent
 import java.util.*
 
 class SimpleAI : AI<EntityCreature>(EntityCreature::class.java) {
-    override fun attach(entity: EntityCreature) {
+    override fun attach(entity: EntityCreature, plugin: Zombies) {
         //TODO
         entity.targetSelector.a(0, TargetGoal(entity, 20.0) { true })
         entity.goalSelector.a(0, MoveTowardTargetGoal(entity))

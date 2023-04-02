@@ -15,8 +15,7 @@ class AIHandler(val zombies: Zombies) {
     fun safeSetAI(entity: EntityInsentient, ai: AI<*>): Boolean {
         return if (ai.canAssign(entity)) {
             clearDefaultAI(entity)
-            zombies.logger.info("Attaching AI Safely")
-            ai.forceAttach(entity)
+            ai.forceAttach(entity,zombies)
             true
         } else {
             false
@@ -28,8 +27,7 @@ class AIHandler(val zombies: Zombies) {
      */
     fun <E : EntityInsentient> setAI(entity: E, ai: AI<E>) {
         clearDefaultAI(entity)
-        zombies.logger.info("Attaching AI")
-        ai.attach(entity)
+        ai.attach(entity,zombies)
     }
 
     private fun clearDefaultAI(e: EntityInsentient) {
