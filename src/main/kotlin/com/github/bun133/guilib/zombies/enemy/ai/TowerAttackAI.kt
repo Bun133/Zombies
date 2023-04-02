@@ -43,19 +43,14 @@ class TowardLocationAI(
     }
 
     override fun c() {
-        val b = entity.navigation.a(targetLocation.x, targetLocation.y, targetLocation.z, speed)
-        if (b) {
-            println("Failed to Navigate")
-        }
+        entity.navigation.a(targetLocation.x, targetLocation.y, targetLocation.z, speed)
     }
 
     override fun b(): Boolean {
-        val b = !entity.navigation.m() && this.entity.h(
+        return !entity.navigation.m() && entity.h(
             targetLocation.x,
             targetLocation.y,
             targetLocation.z
         ) > satisfiedRange * satisfiedRange
-        if (b) println("Satisfied!")
-        return b
     }
 }

@@ -1,6 +1,8 @@
-package com.github.bun133.guilib.zombies.enemy
+package com.github.bun133.guilib.zombies.enemy.spawn
 
 import com.github.bun133.guilib.zombies.Zombies
+import com.github.bun133.guilib.zombies.enemy.Enemy
+import com.github.bun133.guilib.zombies.enemy.EnemyData
 import com.github.bun133.guilib.zombies.randomize
 import net.minecraft.server.v1_16_R3.EntityInsentient
 import org.bukkit.Location
@@ -9,63 +11,54 @@ import org.bukkit.attribute.Attribute
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
-import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.CreatureSpawnEvent
 import org.bukkit.event.entity.SpawnerSpawnEvent
 import org.bukkit.util.Consumer
-import kotlin.math.log10
-import kotlin.math.pow
 
 class SpawnHandler(val plugin: Zombies) : Listener {
     init {
         plugin.server.pluginManager.registerEvents(this, plugin)
-        plugin.server.scheduler.runTaskTimer(plugin, Runnable { sec() }, 0L, 20L * plugin.config.spawnSec.value())
     }
 
-    private val entities = mutableListOf<Pair<Enemy, LivingEntity>>()
+    private val checker = SpawnChecker(plugin, this)
+    private val enemies = mutableListOf<Pair<Enemy, LivingEntity>>()
 
-    fun forceUpdateBottomThreshold(new: Int) {
-        bottomThreshold = new
-    }
-
-    // remainCostがこの値を下回ったら、新しくスポーンさせる
-    private var bottomThreshold = plugin.config.initialThreshold.value()
-
-
-    fun forceFireTick(){
-        sec()
-    }
     /**
-     * Tick関数(20Tickおき)
+     * 強制的にスポーン処理を走らせる
      */
-    private fun sec() {
-        if (listActiveSpawner().isEmpty()) {
-            plugin.logger.info("No Active Spawner!")
-            return
+    fun forceSpawn() {
+        val (isEnough, delta) = isEnemyEnough()
+        if (!isEnough) {
+            // Delta分スポーンさせる
+            spawnNew(delta)
         }
+    }
+
+    var targetSpawnCost: Double = plugin.config.initialSpawnCost.value()
+
+    /**
+     * @return 場に出ている敵が[targetSpawnCost]と比較して充分かどうか,[targetSpawnCost]と現在の差額
+     */
+    internal fun isEnemyEnough(): Pair<Boolean, Double> {
         updateEntityList()
-        val remainCost = entities.map { it.first }.sumOf { it.data.cost }
-        if (remainCost < bottomThreshold) {
-            plugin.logger.info("Spawning! Remain:${remainCost} Threshold:${bottomThreshold}")
-            spawnNew(remainCost)
-            updateBottomThreshold()
-        }
-    }
-
-    private fun updateBottomThreshold() {
-        bottomThreshold = (bottomThreshold * plugin.config.multiplier.value()).toInt()
+        val presentCost = enemies.sumOf { it.first.data.cost }
+        val isEnough = targetSpawnCost <= presentCost
+        val delta = targetSpawnCost - presentCost
+        return isEnough to delta
     }
 
 
-    private fun spawnNew(remainCost: Int) {
-        // このスポーンでどこまでスポーンするか
-        val target = bottomThreshold * Math.E.pow(log10(bottomThreshold / 10.0))
-        val toSpawn = (target - remainCost).toInt()
-        assert(toSpawn > 0)
+    /**
+     * [toSpawn]分の敵をスポーンさせます
+     */
+    internal fun spawnNew(toSpawn: Double) {
+        assert(toSpawn > 0.0)
         val spawnList = generateSpawnSet(toSpawn)
-        val activeSpawner = listActiveSpawner()
+
+        // ActiveなSpawnerに順番にふりまいてスポーンさせる
+        val activeSpawner = listActiveSpawner().shuffled()
         var spawnerIndex = 0
 
         spawnList.forEach {
@@ -82,37 +75,33 @@ class SpawnHandler(val plugin: Zombies) : Listener {
     }
 
     // TODO 改善
-    private fun generateSpawnSet(toSpawn: Int): List<Enemy> {
+    private fun generateSpawnSet(toSpawn: Double): List<Enemy> {
         var target = toSpawn
         val toSpawnEnemies = mutableListOf<Enemy>()
 
         var possible = Enemy.values().filter { it.data.cost <= target }
-        do {
+        while (possible.isNotEmpty()) {
             val chosen = possible.random()
             target -= chosen.data.cost
             toSpawnEnemies.add(chosen)
 
             possible = Enemy.values().filter { it.data.cost <= target }
-        } while (possible.isNotEmpty())
+        }
 
         return toSpawnEnemies
     }
 
 
     private fun updateEntityList() {
-        entities.removeAll {
+        enemies.removeAll {
             !it.second.isValid
         }
     }
 
     // 現在アクティブなスポナー
-    private fun listActiveSpawner(): List<Location> {
+    fun listActiveSpawner(): List<Location> {
         return plugin.config.spawnerLocationList.filter {
-            it.getNearbyEntitiesByType(
-                Player::class.java,
-                plugin.config.activeRange.value()
-            ).isNotEmpty() &&
-                    it.block.lightLevel <= plugin.config.activeLight.value()
+            it.block.lightLevel <= plugin.config.activeLight.value()
         }
     }
 
@@ -144,7 +133,7 @@ class SpawnHandler(val plugin: Zombies) : Listener {
             }
         }
 
-        entities.add(enemy to (spawned as LivingEntity))
+        enemies.add(enemy to (spawned as LivingEntity))
     }
 
     private fun handleNormal(data: EnemyData.Normal, entity: Entity): LivingEntity {

@@ -7,7 +7,7 @@ class SpawnCommand(val plugin: Zombies) : Command("spawn") {
     init {
         setDescription("強制的にスポーンの処理を走らせます")
         execute {
-            plugin.spawn.forceFireTick()
+            plugin.spawn.forceSpawn()
             it.sendSuccess("強制的にスポーン処理を行いました")
         }
     }

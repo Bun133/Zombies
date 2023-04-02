@@ -13,7 +13,7 @@ sealed class EnemyData {
 
     // 敵をスポーンさせるときに考慮に入れる値
     // 強ければ強いほど大きくする
-    abstract val cost: Int
+    abstract val cost: Double
 
     // 基本形
     data class Normal(
@@ -23,7 +23,7 @@ sealed class EnemyData {
         val defence: Double,
         val reward: Int
     ) : EnemyData() {
-        override val cost: Int = reward
+        override val cost: Double = reward.toDouble()
     }
 }
 

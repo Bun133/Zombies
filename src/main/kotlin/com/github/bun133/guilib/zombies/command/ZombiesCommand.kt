@@ -10,7 +10,7 @@ class ZombiesCommand(plugin: Zombies) : Command("zombies") {
             ConfigCommandBuilder(plugin.config).build(),
             TraderCommand(plugin),
             SpawnCommand(plugin),
-            ThresholdCommand(plugin),
+            TargetCostCommand(plugin),
             TargetLocationCommand(plugin)
         )
     }

@@ -3,7 +3,7 @@ package com.github.bun133.guilib.zombies
 import com.github.bun133.guilib.zombies.command.ZombiesCommand
 import com.github.bun133.guilib.zombies.enemy.AIHandler
 import com.github.bun133.guilib.zombies.enemy.KillHandler
-import com.github.bun133.guilib.zombies.enemy.SpawnHandler
+import com.github.bun133.guilib.zombies.enemy.spawn.SpawnHandler
 import com.github.bun133.guilib.zombies.trade.TraderHandler
 import net.kunmc.lab.commandlib.CommandLib
 import org.bukkit.Bukkit

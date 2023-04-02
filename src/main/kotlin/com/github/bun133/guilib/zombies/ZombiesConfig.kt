@@ -15,19 +15,25 @@ class ZombiesConfig(plugin: JavaPlugin) : BaseConfig(plugin) {
     val spawnerLocationList = LocationSetValue()
 
     // Spawnerからこのブロック以内に人がいたらActiveとしてマークする
+    // [Disabled]
     val activeRange = DoubleValue(9.0)
 
     //. SpawnerがActiveになる最高光度
     val activeLight = IntegerValue(13)
 
-    // BottomThresholdの初期値
-    val initialThreshold = IntegerValue(10)
+    // 現在のSpawnCostに合わせてスポーン処理を走らせる間隔
+    val spawnCheckInterval = IntegerValue(20 * 1)
 
-    // BottomThresholdの増加割合
-    val multiplier = DoubleValue(1.01)
+    // SpawnCostの初期値
+    val initialSpawnCost = DoubleValue(10.0)
 
-    // スポーンの頻度
-    val spawnSec = IntegerValue(15)
+    // SpawnCostを[increaseFactor]倍する間隔Tick
+    val increaseIntervalTick = IntegerValue(20 * 1)
+    val increaseFactor = DoubleValue(1.01)
+
+    // 最終時点でのTargetCostの値(復旧用)
+    // なお、自動復旧機能はありません、コマンドをご利用ください
+    val lastTargetCost = DoubleValue(10.0)
 
     // Target Location
     val targetLocation = LocationValue()
