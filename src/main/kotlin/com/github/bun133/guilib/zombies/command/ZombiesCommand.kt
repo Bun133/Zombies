@@ -10,8 +10,9 @@ class ZombiesCommand(plugin: Zombies) : Command("zombies") {
             ConfigCommandBuilder(plugin.config).build(),
             TraderCommand(plugin),
             SpawnCommand(plugin),
-            TargetCostCommand(plugin),
-            TargetLocationCommand(plugin)
+            WaveSetCommand(plugin),
+            TargetLocationCommand(plugin),
+            StartCommand(plugin)
         )
     }
 }

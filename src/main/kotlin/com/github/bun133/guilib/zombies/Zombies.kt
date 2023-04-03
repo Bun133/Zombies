@@ -1,5 +1,6 @@
 package com.github.bun133.guilib.zombies
 
+import com.github.bun133.guilib.zombies.bossbar.BossBarHandler
 import com.github.bun133.guilib.zombies.command.ZombiesCommand
 import com.github.bun133.guilib.zombies.enemy.AIHandler
 import com.github.bun133.guilib.zombies.enemy.KillHandler
@@ -15,6 +16,7 @@ class Zombies : JavaPlugin() {
     lateinit var spawn: SpawnHandler
     lateinit var kill: KillHandler
     lateinit var trader: TraderHandler
+    lateinit var bossbar: BossBarHandler
 
     override fun onEnable() {
         setUpCommands()
@@ -26,6 +28,7 @@ class Zombies : JavaPlugin() {
         spawn = SpawnHandler(this)
         kill = KillHandler(this)
         trader = TraderHandler(this)
+        bossbar = BossBarHandler(this)
 
         SpawnerPlaceListener(this)
     }

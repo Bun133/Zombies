@@ -24,26 +24,40 @@ class SpawnHandler(val plugin: Zombies) : Listener {
 
     private val checker = SpawnChecker(plugin, this)
     private val enemies = mutableListOf<Pair<Enemy, LivingEntity>>()
+    var wave: Int
+        get() = checker.wave
+        set(value) {
+            checker.wave = value
+        }
 
     /**
      * 強制的にスポーン処理を走らせる
      */
     fun forceSpawn() {
-        val (isEnough, delta) = isEnemyEnough()
-        if (!isEnough) {
-            // Delta分スポーンさせる
-            spawnNew(delta)
-        }
+        checker.spawn()
     }
 
     var targetSpawnCost: Double = plugin.config.initialSpawnCost.value()
+        set(value) {
+            field = value
+            plugin.config.lastTargetCost.value(value)
+            plugin.logger.info("TargetSpawnCost Increased to ${value}")
+        }
+
+    /**
+     * 場に出ている敵の合計Cost
+     */
+    internal fun getPresentCost(): Double {
+        updateEntityList()
+        return enemies.sumOf { it.first.data.cost }
+    }
+
 
     /**
      * @return 場に出ている敵が[targetSpawnCost]と比較して充分かどうか,[targetSpawnCost]と現在の差額
      */
     internal fun isEnemyEnough(): Pair<Boolean, Double> {
-        updateEntityList()
-        val presentCost = enemies.sumOf { it.first.data.cost }
+        val presentCost = getPresentCost()
         val isEnough = targetSpawnCost <= presentCost
         val delta = targetSpawnCost - presentCost
         return isEnough to delta
