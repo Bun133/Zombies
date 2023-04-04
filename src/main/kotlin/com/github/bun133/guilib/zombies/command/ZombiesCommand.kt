@@ -9,10 +9,10 @@ class ZombiesCommand(plugin: Zombies) : Command("zombies") {
         addChildren(
             ConfigCommandBuilder(plugin.config).build(),
             TraderCommand(plugin),
-            SpawnCommand(plugin),
-            WaveSetCommand(plugin),
+            NextWaveCommand(plugin),
             TargetLocationCommand(plugin),
-            StartCommand(plugin)
+            StartCommand(plugin),
+            EndCommand(plugin)
         )
     }
 }

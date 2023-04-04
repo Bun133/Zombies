@@ -2,19 +2,23 @@ package com.github.bun133.guilib.zombies.command
 
 import com.github.bun133.guilib.zombies.Zombies
 import net.kunmc.lab.commandlib.Command
-import net.kunmc.lab.commandlib.CommandContext
-import net.kunmc.lab.commandlib.argument.BooleanArgument
 
-class StartCommand(plugin: Zombies) : Command("game") {
+class StartCommand(plugin: Zombies) : Command("start") {
     init {
-        setDescription("Start/End Spawning and other logics")
-        argument(BooleanArgument("start/end")) { toStart: Boolean, ctx: CommandContext ->
-            plugin.config.isWaveStarted.value(toStart)
-            if (toStart) {
-                ctx.sendSuccess("ゲームを開始しました")
-            } else {
-                ctx.sendSuccess("ゲームを終了しました")
-            }
+        setDescription("Start Game and Spawning and other logics")
+        execute {
+            plugin.spawn.startGame()
+            it.sendSuccess("ゲームを開始しました")
+        }
+    }
+}
+
+class EndCommand(plugin: Zombies) : Command("end") {
+    init {
+        setDescription("End Game and Spawning and other logics")
+        execute {
+            plugin.config.isWaveStarted = false
+            it.sendSuccess("ゲームを終了しました")
         }
     }
 }

@@ -1,7 +1,6 @@
 package com.github.bun133.guilib.zombies
 
 import net.kunmc.lab.configlib.BaseConfig
-import net.kunmc.lab.configlib.value.BooleanValue
 import net.kunmc.lab.configlib.value.DoubleValue
 import net.kunmc.lab.configlib.value.IntegerValue
 import net.kunmc.lab.configlib.value.LocationValue
@@ -10,7 +9,7 @@ import org.bukkit.plugin.java.JavaPlugin
 
 class ZombiesConfig(plugin: JavaPlugin) : BaseConfig(plugin) {
     // is Game Started
-    val isWaveStarted = BooleanValue(false)
+    var isWaveStarted: Boolean = false
 
     // TraderのLocationList
     val traderLocationList = LocationSetValue()
@@ -24,9 +23,9 @@ class ZombiesConfig(plugin: JavaPlugin) : BaseConfig(plugin) {
     // SpawnCostの初期値
     val initialSpawnCost = DoubleValue(10.0)
 
-    // Waveの間隔
+    // WaveCheckの間隔
     // 次のWaveはTargetSpawnCostを[increaseFactor]倍される
-    val waveInterval = IntegerValue(20 * 60)
+    val waveCheckInterval = IntegerValue(20 * 1)
     val increaseFactor = DoubleValue(1.1)
 
     // 最終時点でのTargetCostの値(復旧用)

@@ -24,17 +24,16 @@ class SpawnHandler(val plugin: Zombies) : Listener {
 
     private val checker = SpawnChecker(plugin, this)
     private val enemies = mutableListOf<Pair<Enemy, LivingEntity>>()
-    var wave: Int
+    val wave: Int
         get() = checker.wave
-        set(value) {
-            checker.wave = value
-        }
+
+    fun startGame() = checker.startGame()
 
     /**
-     * 強制的にスポーン処理を走らせる
+     * 強制的に次のウェーブに進みます
      */
-    fun forceSpawn() {
-        checker.spawn()
+    fun forceNextWave() {
+        checker.nextWave()
     }
 
     var targetSpawnCost: Double = plugin.config.initialSpawnCost.value()

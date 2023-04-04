@@ -30,7 +30,7 @@ class BossBarHandler(private val plugin: Zombies) {
 
     private fun updateBossBar() {
         val bar = getBossBar()
-        if (!plugin.config.isWaveStarted.value()) {
+        if (!plugin.config.isWaveStarted) {
             bar.isVisible = false
         } else {
             val wave = plugin.spawn.wave

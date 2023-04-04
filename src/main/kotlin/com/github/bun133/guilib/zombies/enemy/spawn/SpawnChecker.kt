@@ -1,6 +1,9 @@
 package com.github.bun133.guilib.zombies.enemy.spawn
 
 import com.github.bun133.guilib.zombies.Zombies
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.title.Title
 import org.bukkit.scheduler.BukkitTask
 import java.lang.Math.pow
 
@@ -12,21 +15,27 @@ class SpawnChecker(private val plugin: Zombies, private val spawnHandler: SpawnH
             waveTask = plugin.server.scheduler.runTaskTimer(
                 plugin,
                 Runnable {
-                    wave()
+                    checkNextWave()
                 },
                 0L,
-                plugin.config.waveInterval.value().toLong()
+                plugin.config.waveCheckInterval.value().toLong()
             )
         }
         setWaver()
-        plugin.config.waveInterval.onModify {
+        plugin.config.waveCheckInterval.onModify {
             waveTask.cancel()
             setWaver()
         }
     }
 
-    internal fun spawn() {
-        if (!plugin.config.isWaveStarted.value()) return
+    fun startGame() {
+        plugin.config.isWaveStarted = true
+        this.wave = 0
+        nextWave()
+    }
+
+    private fun spawn() {
+        if (!plugin.config.isWaveStarted) return
         calTargetSpawnCost()
         val (isEnough, delta) = spawnHandler.isEnemyEnough()
         if (!isEnough) {
@@ -36,14 +45,23 @@ class SpawnChecker(private val plugin: Zombies, private val spawnHandler: SpawnH
     }
 
     var wave = 0
-        set(value) {
+        private set(value) {
             field = value
             plugin.config.lastWaveCount.value(wave)
             plugin.logger.info("New Wave${wave} Started!")
+
+            plugin.server.onlinePlayers.forEach {
+                it.showTitle(
+                    Title.title(
+                        Component.text("WAVE $value"),
+                        Component.text("They're Coming!").color(NamedTextColor.DARK_RED)
+                    )
+                )
+            }
         }
 
-    private fun wave() {
-        if (!plugin.config.isWaveStarted.value()) return
+    fun nextWave() {
+        if (!plugin.config.isWaveStarted) return
         wave++
         if (spawnHandler.listActiveSpawner().isNotEmpty()) {
             // TODO Log使う
@@ -55,5 +73,12 @@ class SpawnChecker(private val plugin: Zombies, private val spawnHandler: SpawnH
     private fun calTargetSpawnCost() {
         spawnHandler.targetSpawnCost =
             plugin.config.initialSpawnCost.value() * pow(plugin.config.increaseFactor.value(), wave.toDouble())
+    }
+
+    private fun checkNextWave() {
+        if (!plugin.config.isWaveStarted) return
+        if (spawnHandler.getPresentCost() == 0.0) {
+            nextWave()
+        }
     }
 }
