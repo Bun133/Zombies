@@ -5,6 +5,7 @@ import com.github.bun133.guilib.zombies.command.ZombiesCommand
 import com.github.bun133.guilib.zombies.enemy.AIHandler
 import com.github.bun133.guilib.zombies.enemy.KillHandler
 import com.github.bun133.guilib.zombies.enemy.spawn.SpawnHandler
+import com.github.bun133.guilib.zombies.enemy.spawn.Waver
 import com.github.bun133.guilib.zombies.trade.TraderHandler
 import net.kunmc.lab.commandlib.CommandLib
 import org.bukkit.Bukkit
@@ -13,10 +14,14 @@ import org.bukkit.plugin.java.JavaPlugin
 class Zombies : JavaPlugin() {
     lateinit var config: ZombiesConfig
     lateinit var ai: AIHandler
+    lateinit var waver: Waver
     lateinit var spawn: SpawnHandler
     lateinit var kill: KillHandler
     lateinit var trader: TraderHandler
     lateinit var bossbar: BossBarHandler
+
+    // is Game Started
+    var isWaveStarted: Boolean = false
 
     override fun onEnable() {
         setUpCommands()
@@ -26,6 +31,7 @@ class Zombies : JavaPlugin() {
 
         ai = AIHandler(this)
         spawn = SpawnHandler(this)
+        waver = Waver(this, spawn)
         kill = KillHandler(this)
         trader = TraderHandler(this)
         bossbar = BossBarHandler(this)

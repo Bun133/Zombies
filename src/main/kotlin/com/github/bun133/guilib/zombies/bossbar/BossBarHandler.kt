@@ -1,6 +1,7 @@
 package com.github.bun133.guilib.zombies.bossbar
 
 import com.github.bun133.guilib.zombies.Zombies
+import com.github.bun133.guilib.zombies.enemy.spawn.Wave
 import org.bukkit.NamespacedKey
 import org.bukkit.boss.*
 import kotlin.math.max
@@ -30,17 +31,45 @@ class BossBarHandler(private val plugin: Zombies) {
 
     private fun updateBossBar() {
         val bar = getBossBar()
-        if (!plugin.config.isWaveStarted) {
+        if (!plugin.isWaveStarted) {
             bar.isVisible = false
         } else {
-            val wave = plugin.spawn.wave
-            val target = plugin.spawn.targetSpawnCost
-            val remain = plugin.spawn.getPresentCost()
-            val progress = min(1.0, max(remain / target, 0.0))
-            bar.setTitle("残りの敵 ウェーブ:${wave}")
-            bar.progress = progress
-            bar.isVisible = true
-            showToAll(bar)
+            val wave = plugin.waver.wave
+            when (wave) {
+                is Wave.BeforeGame -> {
+                    // Hide
+                    bar.isVisible = false
+                }
+
+                is Wave.Attack -> {
+                    val target = plugin.spawn.targetSpawnCost
+                    val remain = plugin.spawn.getPresentCost()
+                    val progress = min(1.0, max(remain / target, 0.0))
+                    bar.setTitle("ウェーブ${wave.wave} 残りの敵")
+                    bar.progress = progress
+                    bar.isVisible = true
+                    showToAll(bar)
+                }
+
+                is Wave.Prepare -> {
+                    val remain = max(wave.durationTick - (plugin.server.currentTick - wave.startServerTime), 0)
+
+                    val progress =
+                        min(
+                            1.0,
+                            max(
+                                remain.toDouble() / wave.durationTick.toDouble(),
+                                0.0
+                            )
+                        )
+
+                    bar.setTitle("準備フェーズ 残り${remain / 20}秒")
+                    bar.progress = progress
+                    bar.isVisible = true
+                    showToAll(bar)
+                }
+            }
+
         }
     }
 }

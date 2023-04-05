@@ -22,19 +22,7 @@ class SpawnHandler(val plugin: Zombies) : Listener {
         plugin.server.pluginManager.registerEvents(this, plugin)
     }
 
-    private val checker = SpawnChecker(plugin, this)
     private val enemies = mutableListOf<Pair<Enemy, LivingEntity>>()
-    val wave: Int
-        get() = checker.wave
-
-    fun startGame() = checker.startGame()
-
-    /**
-     * 強制的に次のウェーブに進みます
-     */
-    fun forceNextWave() {
-        checker.nextWave()
-    }
 
     var targetSpawnCost: Double = plugin.config.initialSpawnCost.value()
         set(value) {
@@ -113,9 +101,7 @@ class SpawnHandler(val plugin: Zombies) : Listener {
 
     // 現在アクティブなスポナー
     fun listActiveSpawner(): List<Location> {
-        return plugin.config.spawnerLocationList.filter {
-            it.block.lightLevel <= plugin.config.activeLight.value()
-        }
+        return plugin.config.spawnerLocationList.value().toList()
     }
 
     @EventHandler

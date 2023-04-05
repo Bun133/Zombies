@@ -7,7 +7,7 @@ class StartCommand(plugin: Zombies) : Command("start") {
     init {
         setDescription("Start Game and Spawning and other logics")
         execute {
-            plugin.spawn.startGame()
+            plugin.waver.startGame()
             it.sendSuccess("ゲームを開始しました")
         }
     }
@@ -17,7 +17,7 @@ class EndCommand(plugin: Zombies) : Command("end") {
     init {
         setDescription("End Game and Spawning and other logics")
         execute {
-            plugin.config.isWaveStarted = false
+            plugin.waver.endGame()
             it.sendSuccess("ゲームを終了しました")
         }
     }

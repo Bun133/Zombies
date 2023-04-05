@@ -8,17 +8,12 @@ import net.kunmc.lab.configlib.value.collection.LocationSetValue
 import org.bukkit.plugin.java.JavaPlugin
 
 class ZombiesConfig(plugin: JavaPlugin) : BaseConfig(plugin) {
-    // is Game Started
-    var isWaveStarted: Boolean = false
 
     // TraderのLocationList
     val traderLocationList = LocationSetValue()
 
     // SpawnerのLocationList
     val spawnerLocationList = LocationSetValue()
-
-    //. SpawnerがActiveになる最高光度
-    val activeLight = IntegerValue(13)
 
     // SpawnCostの初期値
     val initialSpawnCost = DoubleValue(10.0)
