@@ -10,9 +10,14 @@ class Trader(plugin: Zombies, location: Location) {
     val trading = tradings
 
     init {
+        // 村人だけ残ってるとき用
+        location.world.getNearbyEntitiesByType(Villager::class.java, location, 0.5).forEach {
+            it.remove()
+        }
         entity = location.world.spawnEntity(location, EntityType.VILLAGER) as Villager
         entity.setAI(false)
         entity.removeWhenFarAway = false
+        entity.profession = Villager.Profession.ARMORER
 
         plugin.trader.register(this)
     }

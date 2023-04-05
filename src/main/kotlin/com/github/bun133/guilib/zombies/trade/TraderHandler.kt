@@ -9,14 +9,16 @@ import com.github.bun133.guifly.type
 import com.github.bun133.guilib.zombies.Zombies
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
+import org.bukkit.GameMode
 import org.bukkit.Instrument
 import org.bukkit.Note
 import org.bukkit.entity.Player
 import org.bukkit.entity.Villager
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.entity.EntityDamageByBlockEvent
+import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityDamageEvent
-import org.bukkit.event.entity.EntityDeathEvent
 import org.bukkit.event.player.PlayerInteractAtEntityEvent
 
 class TraderHandler(private val plugin: Zombies) : Listener {
@@ -32,19 +34,23 @@ class TraderHandler(private val plugin: Zombies) : Listener {
 
         plugin.server.scheduler.runTaskLater(plugin, Runnable {
             plugin.config.traderLocationList.toList().forEach {
-                it.getNearbyEntitiesByType(Villager::class.java, 1.0).forEach {v ->
+                it.getNearbyEntitiesByType(Villager::class.java, 1.0).forEach { v ->
                     v.remove()
                 }
                 traders.add(Trader(plugin, it))
             }
-        },10L)   // lateinitをごまかす
+        }, 10L)   // lateinitをごまかす
     }
 
     @EventHandler
     fun onClickTrader(e: PlayerInteractAtEntityEvent) {
         val trader = traders.find { it.entity == e.rightClicked }
         if (trader != null) {
-            generateGUI(trader, e.player).open(e.player)
+            e.isCancelled = true
+            plugin.server.scheduler.runTaskLater(plugin, Runnable {
+                e.player.closeInventory()
+                generateGUI(trader, e.player).open(e.player)
+            }, 1L)
         } else {
             // Leave it as it is
         }
@@ -90,14 +96,15 @@ class TraderHandler(private val plugin: Zombies) : Listener {
 
     // 村人を無敵に
     @EventHandler
-    fun onDamage(e: EntityDamageEvent) {
+    fun onDamage(e: EntityDamageByEntityEvent) {
+        if (e.damager is Player && (e.damager as Player).gameMode == GameMode.CREATIVE) return
         if (e.entity in traders.map { it.entity }) {
             e.isCancelled = true
         }
     }
 
     @EventHandler
-    fun onDeath(e: EntityDeathEvent) {
+    fun onDamage(e: EntityDamageByBlockEvent) {
         if (e.entity in traders.map { it.entity }) {
             e.isCancelled = true
         }
