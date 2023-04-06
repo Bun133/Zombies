@@ -10,7 +10,7 @@ import org.bukkit.inventory.ItemStack
 
 data class Popper(
     val item: ItemStack,
-    val onPop: (Zombies) -> ((Location, BlockFace, Player) -> Unit)
+    val onPop: (Zombies) -> ((Location, BlockFace, Player) -> Boolean)
 )
 
 val popInstantTower = Popper(
@@ -27,21 +27,24 @@ val pops = listOf(
 private object InstantTower {
     val data: SchemData = listOf(
         listOf(
-            "120",
-            "000",
-            "000"
+            "0N0",
+            "W1E",
+            "0S0"
         ),
         listOf(
-            "120",
-            "000",
-            "000"
+            "0N0",
+            "W1E",
+            "0S0"
         )
     )
 
     val map = mapOf(
         '0' to BlockReflector.material(Material.AIR),
         '1' to BlockReflector.material(Material.STONE),
-        '2' to BlockReflector.blockData("minecraft:ladder[facing=east]"),
+        'N' to BlockReflector.blockData("minecraft:ladder[facing=north]"),
+        'S' to BlockReflector.blockData("minecraft:ladder[facing=south]"),
+        'W' to BlockReflector.blockData("minecraft:ladder[facing=west]"),
+        'E' to BlockReflector.blockData("minecraft:ladder[facing=east]"),
     )
 }
 

@@ -20,7 +20,7 @@ class PopHandler(private val plugin: Zombies) : Listener {
 
     private data class CachedPopper(
         val item: ItemStack,
-        val onPop: (Location, BlockFace, Player) -> Unit
+        val onPop: (Location, BlockFace, Player) -> Boolean
     )
 
     private val cachedPopper = pops.map { CachedPopper(it.item, it.onPop(plugin)) }
@@ -35,8 +35,13 @@ class PopHandler(private val plugin: Zombies) : Listener {
                     val blockFace = velocityToDirection(e.entity.velocity)
                     val player = e.entity.shooter as? Player
                     if (player != null) {
-                        pop.onPop(e.hitBlock!!.location.clone().add(0.0, 1.0, 0.0), blockFace, player)
-                        player.sendMessage(Component.text("展開しました").color(NamedTextColor.GREEN))
+                        val b = pop.onPop(e.hitBlock!!.location.clone().add(0.0, 1.0, 0.0), blockFace, player)
+                        if (b) {
+                            player.sendMessage(Component.text("展開しました").color(NamedTextColor.GREEN))
+                        } else {
+                            player.sendMessage(Component.text("障害物に当たったため展開を中断します").color(NamedTextColor.RED))
+                            player.inventory.addItem(pop.item.clone())
+                        }
                     } else {
                         plugin.logger.warning("Non Player Snowball")
                     }

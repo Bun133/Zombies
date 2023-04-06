@@ -45,21 +45,45 @@ class StringSchemPopper(val plugin: JavaPlugin, val schem: Schem) {
         )
     }
 
+    private data class BlockChange(
+        val location: Location,
+        val from: ConvertedBlockReflector,
+        val to: ConvertedBlockReflector
+    ) {
+        fun rollBack() {
+            if (from.type != null) {
+                location.block.type = from.type
+            }
+            if (from.blockData != null) {
+                location.block.blockData = from.blockData
+            }
+        }
+    }
+
 
     /**
      * 常に中心を[location]に合わせるように努める
      */
-    fun onPop(location: Location, facing: BlockFace, player: Player) {
+    fun onPop(location: Location, facing: BlockFace, player: Player): Boolean {
         val rotateTimes = rotateTimes(facing)
         // Rotate Directional
         val rotatedBlockData = convertedBlockData.mapValues { rotateRight(it.value.clone(), rotateTimes) }
 
+        val changes = mutableListOf<BlockChange>()
 
         schem.schemData.forEachIndexed { index, strings ->
             val targetY = location.blockY + index
             val rotatedStrings = rotate(strings, rotateTimes)
-            place(location.clone().apply { y = targetY.toDouble() }, rotatedStrings, rotatedBlockData)
+            val b = place(location.clone().apply { y = targetY.toDouble() }, rotatedStrings, rotatedBlockData)
+            changes.addAll(b.second)
+            if (!b.first) {
+                // この段で何か他のブロックに当たったので中断
+                // ロールバック処理
+                changes.forEach { it.rollBack() }
+                return false
+            }
         }
+        return true
     }
 
     private fun rotateTimes(facing: BlockFace): Int {
@@ -127,11 +151,17 @@ class StringSchemPopper(val plugin: JavaPlugin, val schem: Schem) {
      * 実際に設置する
      * @note list内のStringのlengthにばらつきがあるときは非対応
      */
-    private fun place(center: Location, strings: List<String>, rotatedBlockData: Map<Char, ConvertedBlockReflector>) {
+    private fun place(
+        center: Location,
+        strings: List<String>,
+        rotatedBlockData: Map<Char, ConvertedBlockReflector>
+    ): Pair<Boolean, List<BlockChange>> {
         val height = strings.size
         val width = strings[0].length
         val heightShift = height / 2
         val widthShift = width / 2
+
+        val blockChanges = mutableListOf<BlockChange>()
 
         strings.forEachIndexed { zIndex, s ->
             val shiftedZ = center.blockZ - heightShift + zIndex
@@ -139,10 +169,21 @@ class StringSchemPopper(val plugin: JavaPlugin, val schem: Schem) {
                 val shiftedX = center.blockX - widthShift + xIndex
 
                 val block = center.world.getBlockAt(shiftedX, center.blockY, shiftedZ)
-                val blockReflector = rotatedBlockData[c]
-                if (blockReflector == null) {
-                    throw IllegalArgumentException("Char $c is not listed in schemMap")
+
+                if (block.type != Material.AIR) {
+                    return false to blockChanges
                 }
+
+                val blockReflector = rotatedBlockData[c] ?: throw IllegalArgumentException("Char $c is not listed in schemMap")
+
+                blockChanges.add(
+                    BlockChange(
+                        block.location,
+                        ConvertedBlockReflector(block.blockData, block.type),
+                        blockReflector
+                    )
+                )
+
                 if (blockReflector.blockData != null) {
                     block.setBlockData(blockReflector.blockData, false)
                 } else if (blockReflector.type != null) {
@@ -152,5 +193,7 @@ class StringSchemPopper(val plugin: JavaPlugin, val schem: Schem) {
                 }
             }
         }
+
+        return true to blockChanges
     }
 }
