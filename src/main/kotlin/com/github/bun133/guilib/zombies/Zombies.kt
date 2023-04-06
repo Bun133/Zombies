@@ -6,6 +6,7 @@ import com.github.bun133.guilib.zombies.enemy.AIHandler
 import com.github.bun133.guilib.zombies.enemy.KillHandler
 import com.github.bun133.guilib.zombies.enemy.spawn.SpawnHandler
 import com.github.bun133.guilib.zombies.enemy.spawn.Waver
+import com.github.bun133.guilib.zombies.pop.PopHandler
 import com.github.bun133.guilib.zombies.trade.TraderHandler
 import net.kunmc.lab.commandlib.CommandLib
 import org.bukkit.Bukkit
@@ -17,6 +18,7 @@ class Zombies : JavaPlugin() {
     lateinit var waver: Waver
     lateinit var spawn: SpawnHandler
     lateinit var kill: KillHandler
+    lateinit var pop: PopHandler
     lateinit var trader: TraderHandler
     lateinit var bossbar: BossBarHandler
 
@@ -33,6 +35,7 @@ class Zombies : JavaPlugin() {
         spawn = SpawnHandler(this)
         waver = Waver(this, spawn)
         kill = KillHandler(this)
+        pop = PopHandler(this)
         trader = TraderHandler(this)
         bossbar = BossBarHandler(this)
 

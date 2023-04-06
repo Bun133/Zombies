@@ -1,5 +1,7 @@
 package com.github.bun133.guilib.zombies.trade
 
+import com.github.bun133.guilib.zombies.pop.Popper
+import com.github.bun133.guilib.zombies.pop.popInstantTower
 import net.kyori.adventure.text.Component
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -52,6 +54,11 @@ val tradings = mutableListOf(
         Component.text("肉"),
         arrayOf("うまいぞ。", "まとめ買いはお得だな。賢い。").textComponent(),
         5
+    ),
+    trade(
+        popInstantTower,
+        arrayOf("きっと役に立つ").textComponent(),
+        5
     )
 )
 
@@ -76,6 +83,22 @@ private fun trade(
                 i.displayName(name)
             }
         })
+    }
+}
+
+private fun trade(
+    popper: Popper,
+    lores: MutableList<Component>,
+    level: Int
+): Trading {
+    lores.addAll(arrayOf("", "価格:${level}レベル").textComponent())
+
+    return Trading(popper.item.clone().apply {
+        editMeta {
+            it.lore(lores)
+        }
+    }, level) {
+        it.inventory.addItem(popper.item.clone())
     }
 }
 
