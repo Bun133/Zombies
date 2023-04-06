@@ -15,21 +15,33 @@ sealed class EnemyData {
     // 強ければ強いほど大きくする
     abstract val cost: Double
 
+    abstract val ai: AI<*>
+
     // 基本形
     data class Normal(
         override val entityType: EntityType,
         val health: Double,
         val attack: Double,
         val defence: Double,
-        val reward: Int
+        val reward: Int,
+        override val ai: AI<*>
     ) : EnemyData() {
         override val cost: Double = reward.toDouble()
     }
+
+    data class Simple(
+        override val entityType: EntityType,
+        val dropExp: Int,
+        override val cost: Double,
+        override val ai: AI<*>
+    ) : EnemyData()
 }
 
-enum class Enemy(val data: EnemyData,val ai: AI<*>) {
-    Zombie(EnemyData.Normal(EntityType.ZOMBIE, 10.0, 1.0, 1.0, 1), TowerAttackAI()),
-    Skeleton(EnemyData.Normal(EntityType.SKELETON, 10.0, 2.0, 1.0, 3),TowerAttackAI());
+enum class Enemy(val weight: Double, val data: EnemyData) {
+    Zombie(10.0, EnemyData.Simple(EntityType.ZOMBIE, 5, 1.0, TowerAttackAI())),
+    Skeleton(1.0, EnemyData.Simple(EntityType.SKELETON, 10, 5.0, TowerAttackAI())),
+    EnderMan(0.5, EnemyData.Simple(EntityType.ENDERMAN, 50, 10.0, TowerAttackAI())),
+    IronGolem(0.1, EnemyData.Simple(EntityType.IRON_GOLEM, 1000, 100.0, TowerAttackAI()));
 
     companion object {
         fun inferEnemy(entity: Entity): Enemy? {

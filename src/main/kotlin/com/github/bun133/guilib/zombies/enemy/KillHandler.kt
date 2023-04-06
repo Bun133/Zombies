@@ -26,10 +26,15 @@ class KillHandler(plugin: Zombies) : Listener {
     }
 
     private fun handleDeath(e: EntityDeathEvent, enemy: Enemy) {
-        val enemyData = enemy.data
-        when (enemyData) {
+        when (val enemyData = enemy.data) {
             is EnemyData.Normal -> {
                 e.droppedExp = enemyData.reward
+                e.drops.clear()
+            }
+
+            is EnemyData.Simple -> {
+                e.droppedExp = enemyData.dropExp
+                e.drops.clear()
             }
         }
     }

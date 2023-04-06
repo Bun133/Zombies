@@ -16,6 +16,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.entity.CreatureSpawnEvent
 import org.bukkit.event.entity.SpawnerSpawnEvent
 import org.bukkit.util.Consumer
+import kotlin.random.Random
 
 class SpawnHandler(val plugin: Zombies) : Listener {
     init {
@@ -82,7 +83,7 @@ class SpawnHandler(val plugin: Zombies) : Listener {
 
         var possible = Enemy.values().filter { it.data.cost <= target }
         while (possible.isNotEmpty()) {
-            val chosen = possible.random()
+            val chosen = randomPick(possible)
             target -= chosen.data.cost
             toSpawnEnemies.add(chosen)
 
@@ -90,6 +91,19 @@ class SpawnHandler(val plugin: Zombies) : Listener {
         }
 
         return toSpawnEnemies
+    }
+
+    private fun randomPick(possible: List<Enemy>): Enemy {
+        val all = possible.sumOf { it.weight }
+        val picked = all * Random.nextDouble()
+        var currentIndex = 0
+        var sum = possible[currentIndex].weight
+        while (sum < picked) {
+            currentIndex++
+            sum += possible[currentIndex].weight
+        }
+
+        return possible[currentIndex]
     }
 
 
@@ -112,15 +126,16 @@ class SpawnHandler(val plugin: Zombies) : Listener {
     fun spawnEnemy(enemy: Enemy, loc: Location) {
         val enemyData = enemy.data
         val created = when (enemyData) {
-            is EnemyData.Normal -> {
+            is EnemyData.Normal,
+            is EnemyData.Simple -> {
                 createEntity(loc, enemyData.entityType.entityClass!!) as EntityInsentient
             }
         }
 
         // setAI
-        if (!plugin.ai.safeSetAI(created, enemy.ai)) {
+        if (!plugin.ai.safeSetAI(created, enemy.data.ai)) {
             // Failed to Set AI
-            plugin.logger.warning("Failed to Set AI,Entity:${created},Enemy AI:${enemy.ai}")
+            plugin.logger.warning("Failed to Set AI,Entity:${created},Enemy AI:${enemy.data.ai}")
         }
 
         // Spawn
@@ -129,6 +144,10 @@ class SpawnHandler(val plugin: Zombies) : Listener {
         when (enemyData) {
             is EnemyData.Normal -> {
                 handleNormal(enemyData, spawned)
+            }
+
+            is EnemyData.Simple -> {
+                // Nothing
             }
         }
 

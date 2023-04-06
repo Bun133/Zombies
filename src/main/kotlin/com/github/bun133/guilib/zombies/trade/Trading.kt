@@ -27,34 +27,43 @@ data class Trading(
 val tradings = mutableListOf(
     trade(
         ItemStack(Material.WOODEN_SWORD),
-        Component.text("木の剣"),
-        arrayOf("木で出来た剣", "ちょっともろいらしい", "", "安くしておくよ。").textComponent(),
+        null,
+        arrayOf("木で出来た剣").textComponent(),
         0
     ),
     trade(
         ItemStack(Material.STONE_SWORD),
-        Component.text("石の剣"),
+        null,
         arrayOf("石で出来た剣", "それなりに頼りになる").textComponent(),
         2
     ),
     trade(
         ItemStack(Material.IRON_SWORD),
-        Component.text("鉄の剣"),
+        null,
         arrayOf("鉄で出来た剣", "これは頼りになる").textComponent(),
         10
     ),
     trade(
         ItemStack(Material.COOKED_BEEF, 1),
-        Component.text("肉"),
+        null,
         arrayOf("うまいぞ。").textComponent(),
         1
     ),
     trade(
         ItemStack(Material.COOKED_BEEF, 8),
-        Component.text("肉"),
+        null,
         arrayOf("うまいぞ。", "まとめ買いはお得だな。賢い。").textComponent(),
         5
     ),
+    *trade(
+        0,
+        arrayOf("ちょっと臭いな。").textComponent(),
+        null,
+        ItemStack(Material.LEATHER_HELMET),
+        ItemStack(Material.LEATHER_CHESTPLATE),
+        ItemStack(Material.LEATHER_LEGGINGS),
+        ItemStack(Material.LEATHER_BOOTS),
+    ).toTypedArray(),
     trade(
         popInstantTower,
         arrayOf("きっと役に立つ").textComponent(),
@@ -63,8 +72,19 @@ val tradings = mutableListOf(
 )
 
 private fun trade(
+    level: Int,
+    lores: MutableList<Component>,
+    name: Component? = null,
+    vararg item: ItemStack
+): List<Trading> {
+    return item.map {
+        trade(it, name, lores, level, false)
+    }
+}
+
+private fun trade(
     item: ItemStack,
-    name: Component,
+    name: Component? = null,
     lores: MutableList<Component>,
     level: Int,
     extendLores: Boolean = false
@@ -74,13 +94,17 @@ private fun trade(
     return Trading(item.clone().apply {
         editMeta {
             it.lore(lores)
-            it.displayName(name)
+            if (name != null) {
+                it.displayName(name)
+            }
         }
     }, level) {
         it.inventory.addItem(item.clone().apply {
             editMeta { i ->
                 if (extendLores) i.lore(lores)
-                i.displayName(name)
+                if (name != null) {
+                    i.displayName(name)
+                }
             }
         })
     }
