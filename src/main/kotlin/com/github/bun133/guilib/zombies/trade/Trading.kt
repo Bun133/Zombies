@@ -44,6 +44,30 @@ val tradings = mutableListOf(
         10
     ),
     trade(
+        ItemStack(Material.BOW),
+        null,
+        arrayOf("遠くからでも戦える").textComponent(),
+        5
+    ),
+    trade(
+        ItemStack(Material.CROSSBOW),
+        null,
+        arrayOf("強い。").textComponent(),
+        10
+    ),
+    trade(
+        ItemStack(Material.ARROW, 16),
+        null,
+        arrayOf("これがなきゃ戦えない").textComponent(),
+        1
+    ),
+    trade(
+        ItemStack(Material.ROTTEN_FLESH, 16),
+        null,
+        arrayOf("まずいぞ。").textComponent(),
+        0
+    ),
+    trade(
         ItemStack(Material.COOKED_BEEF, 1),
         null,
         arrayOf("うまいぞ。").textComponent(),

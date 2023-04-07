@@ -1,6 +1,7 @@
 package com.github.bun133.guilib.zombies.bossbar
 
 import com.github.bun133.guilib.zombies.Zombies
+import com.github.bun133.guilib.zombies.core.Core
 import com.github.bun133.guilib.zombies.enemy.spawn.Wave
 import org.bukkit.NamespacedKey
 import org.bukkit.boss.*
@@ -9,14 +10,14 @@ import kotlin.math.min
 
 class BossBarHandler(private val plugin: Zombies) {
     init {
-        plugin.server.scheduler.runTaskTimer(plugin, Runnable { updateBossBar() }, 20L, 20L)
+        plugin.server.scheduler.runTaskTimer(plugin, Runnable { updateWaveBossBar();updateCoreBossBar() }, 20L, 20L)
     }
 
-    private val nameKey = NamespacedKey(plugin, "bossbar")
-    private fun getBossBar(): KeyedBossBar {
-        return plugin.server.getBossBar(nameKey) ?: plugin.server.createBossBar(
-            nameKey,
-            "残りの敵",
+    private val waveBossBarKey = NamespacedKey(plugin, "bossbar")
+    private fun getBossBar(key: NamespacedKey, default: String): KeyedBossBar {
+        return plugin.server.getBossBar(key) ?: plugin.server.createBossBar(
+            key,
+            default,
             BarColor.WHITE,
             BarStyle.SEGMENTED_20,
             BarFlag.CREATE_FOG
@@ -29,8 +30,8 @@ class BossBarHandler(private val plugin: Zombies) {
         }
     }
 
-    private fun updateBossBar() {
-        val bar = getBossBar()
+    private fun updateWaveBossBar() {
+        val bar = getBossBar(waveBossBarKey, "残りの敵")
         if (!plugin.isWaveStarted) {
             bar.isVisible = false
         } else {
@@ -70,6 +71,31 @@ class BossBarHandler(private val plugin: Zombies) {
                 }
             }
 
+        }
+    }
+
+    private fun getCoreBossBarKey(core: Core): NamespacedKey {
+        return NamespacedKey(plugin, "${core.blockLocation.hashCode()}")
+    }
+
+    private fun getCoreBossBar(core: Core): KeyedBossBar {
+        return getBossBar(getCoreBossBarKey(core), "コア")
+    }
+
+    private fun updateCoreBossBar() {
+        if (!plugin.isWaveStarted) {
+            plugin.core.damages.forEach { (core, damage) ->
+                val bar = getCoreBossBar(core)
+                bar.isVisible = false
+            }
+        } else {
+            plugin.core.damages.forEach { (core, damage) ->
+                val bar = getCoreBossBar(core)
+                bar.isVisible = true
+                bar.progress = 1.0 - damage
+                bar.setTitle("コア 耐久")
+                showToAll(bar)
+            }
         }
     }
 }

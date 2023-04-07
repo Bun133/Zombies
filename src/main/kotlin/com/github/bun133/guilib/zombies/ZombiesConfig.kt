@@ -15,6 +15,12 @@ class ZombiesConfig(plugin: JavaPlugin) : BaseConfig(plugin) {
     // SpawnerのLocationList
     val spawnerLocationList = LocationSetValue()
 
+    // CoreのLocationList
+    val coreLocationList = LocationSetValue()
+
+    // Coreを破壊できる範囲
+    val coreBreakRange = DoubleValue(1.5)
+
     // SpawnCostの初期値
     val initialSpawnCost = DoubleValue(10.0)
 

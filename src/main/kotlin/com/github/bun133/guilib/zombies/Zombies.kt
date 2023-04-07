@@ -2,6 +2,8 @@ package com.github.bun133.guilib.zombies
 
 import com.github.bun133.guilib.zombies.bossbar.BossBarHandler
 import com.github.bun133.guilib.zombies.command.ZombiesCommand
+import com.github.bun133.guilib.zombies.core.Core
+import com.github.bun133.guilib.zombies.core.CoreHandler
 import com.github.bun133.guilib.zombies.enemy.AIHandler
 import com.github.bun133.guilib.zombies.enemy.KillHandler
 import com.github.bun133.guilib.zombies.enemy.spawn.SpawnHandler
@@ -20,6 +22,7 @@ class Zombies : JavaPlugin() {
     lateinit var kill: KillHandler
     lateinit var pop: PopHandler
     lateinit var trader: TraderHandler
+    lateinit var core: CoreHandler
     lateinit var bossbar: BossBarHandler
 
     // is Game Started
@@ -37,6 +40,7 @@ class Zombies : JavaPlugin() {
         kill = KillHandler(this)
         pop = PopHandler(this)
         trader = TraderHandler(this)
+        core = CoreHandler(this)
         bossbar = BossBarHandler(this)
 
         SpawnerPlaceListener(this)
