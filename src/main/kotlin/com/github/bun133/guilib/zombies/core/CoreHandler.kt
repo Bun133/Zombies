@@ -6,6 +6,7 @@ import com.github.bun133.guilib.zombies.enemy.animate.Animation
 import net.minecraft.server.v1_16_R3.BlockPosition
 import net.minecraft.server.v1_16_R3.PacketPlayOutBlockBreakAnimation
 import org.bukkit.Location
+import org.bukkit.Material
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer
 import org.bukkit.entity.Mob
 
@@ -20,18 +21,24 @@ class CoreHandler(val zombies: Zombies) {
 
 
     val damages = mutableMapOf<Core, Float>()
-    private val lastSendDamage = mutableMapOf<Core, Float>()
 
     init {
         zombies.config.coreLocationList.value().forEach {
-            damages[Core(it)] = 0.0F
+            damages[Core(it.toBlockLocation())] = 0.0F
         }
         zombies.config.coreLocationList.onModify {
             val alreadyExist = damages.map { d -> d.key.blockLocation }
-            it.filter { l -> l !in alreadyExist }.forEach { l ->
+            it.map { l -> l.toBlockLocation() }.filter { l -> l !in alreadyExist }.forEach { l ->
                 damages[Core(l)] = 0.0F
             }
         }
+    }
+
+    /**
+     * コアのダメージをリセットします
+     */
+    fun resetCoreDamages() {
+        damages.replaceAll { _, _ -> 0.0F }
     }
 
     private fun update() {
@@ -50,12 +57,16 @@ class CoreHandler(val zombies: Zombies) {
             animateBreak(nearBy)
 
             val costSum = nearBy.mapNotNull(Enemy::inferEnemy).sumOf { it.data.cost }
-            val addDamage = costSum.toFloat() * 0.001F // TODO Config
+            val addDamage = costSum.toFloat() * zombies.config.coreBreakRate.value()
 
             damages[c] = damages[c]!! + addDamage
 
-            if (damages[c]!! >= 1.0) {
-                // TODO 破壊・敗北処理
+            if (damages[c]!! >= 1.0F) {
+                damages[c] = 1.0F
+                c.blockLocation.block.type = Material.AIR
+                if (damages.isEmpty()) {
+                    zombies.onLose()
+                }
             }
         }
     }
