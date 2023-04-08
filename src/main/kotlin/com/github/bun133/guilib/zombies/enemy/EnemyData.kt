@@ -35,13 +35,15 @@ sealed class EnemyData {
         override val entityType: EntityType,
         val dropExp: Int,
         override val cost: Double,
-        override val ai: AI<*>
+        override val ai: AI<*>,
+        // 手に持ってるアイテムをクリアするフラッグ
+        val itemClear: Boolean = true
     ) : EnemyData()
 }
 
 enum class Enemy(val weight: Double, val data: EnemyData) {
     Zombie(10.0, EnemyData.Simple(EntityType.ZOMBIE, 5, 1.0, TowerAttackAI())),
-    Skeleton(1.0, EnemyData.Simple(EntityType.SKELETON, 10, 5.0, TowerAttackAI())),
+    Skeleton(1.0, EnemyData.Simple(EntityType.SKELETON, 10, 5.0, TowerAttackAI(), itemClear = false)),
     EnderMan(0.5, EnemyData.Simple(EntityType.ENDERMAN, 50, 10.0, TowerAttackAI())),
     IronGolem(0.1, EnemyData.Simple(EntityType.IRON_GOLEM, 1000, 100.0, TowerAttackAI()));
 

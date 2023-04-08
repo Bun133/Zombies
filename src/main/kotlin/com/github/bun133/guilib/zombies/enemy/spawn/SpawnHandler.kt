@@ -139,7 +139,7 @@ class SpawnHandler(val plugin: Zombies) : Listener {
         }
 
         // Spawn
-        val spawned = addEntity(created, loc.world)
+        val spawned = addEntity(created, loc.world) as LivingEntity
         // Marking
         Enemy.markDataTag(enemy, spawned)
 
@@ -149,22 +149,26 @@ class SpawnHandler(val plugin: Zombies) : Listener {
             }
 
             is EnemyData.Simple -> {
-                // Nothing
+                if (enemyData.itemClear) {
+                    spawned.equipment!!.setItemInMainHand(null)
+                    spawned.equipment!!.setItemInOffHand(null)
+                }
             }
         }
 
-        enemies.add(enemy to (spawned as LivingEntity))
+        enemies.add(enemy to spawned)
     }
 
-    private fun handleNormal(data: EnemyData.Normal, entity: Entity): LivingEntity {
-        if (entity !is LivingEntity) throw Error("#handleNormal is not able to handle spawning non-living entity")
-
+    private fun handleNormal(data: EnemyData.Normal, entity: LivingEntity): LivingEntity {
         entity.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.baseValue = data.health
         entity.health = data.health
 
         entity.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE)!!.baseValue = data.attack
 
         entity.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS)!!.baseValue = data.defence
+
+        entity.equipment!!.setItemInMainHand(null)
+        entity.equipment!!.setItemInOffHand(null)
 
         return entity
     }
