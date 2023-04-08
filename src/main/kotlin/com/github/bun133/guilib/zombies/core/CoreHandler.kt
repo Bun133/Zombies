@@ -2,7 +2,12 @@ package com.github.bun133.guilib.zombies.core
 
 import com.github.bun133.guilib.zombies.Zombies
 import com.github.bun133.guilib.zombies.enemy.Enemy
+import com.github.bun133.guilib.zombies.enemy.animate.Animation
+import net.minecraft.server.v1_16_R3.BlockPosition
+import net.minecraft.server.v1_16_R3.PacketPlayOutBlockBreakAnimation
 import org.bukkit.Location
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer
+import org.bukkit.entity.Mob
 
 data class Core(
     val blockLocation: Location
@@ -30,14 +35,21 @@ class CoreHandler(val zombies: Zombies) {
     }
 
     private fun update() {
+        updateDamage()
+        updateBlockBreak()
+    }
+
+    private fun updateDamage() {
         damages.keys.forEach { c ->
             val nearBy = c.blockLocation.getNearbyEntities(
                 zombies.config.coreBreakRange.value(),
                 zombies.config.coreBreakRange.value(),
                 zombies.config.coreBreakRange.value()
-            )
+            ).filterIsInstance<Mob>()
 
-            val costSum = nearBy.sumOf { Enemy.inferEnemy(it)?.data?.cost ?: 0.0 }
+            animateBreak(nearBy)
+
+            val costSum = nearBy.mapNotNull(Enemy::inferEnemy).sumOf { it.data.cost }
             val addDamage = costSum.toFloat() * 0.001F // TODO Config
 
             damages[c] = damages[c]!! + addDamage
@@ -46,22 +58,36 @@ class CoreHandler(val zombies: Zombies) {
                 // TODO 破壊・敗北処理
             }
         }
+    }
 
-        updateBlockBreak()
+    private fun animateBreak(entities: List<Mob>) {
+        entities.forEach {
+            Animation.SwingHand.animate(it)
+        }
     }
 
     private fun updateBlockBreak() {
-        val toSend = mutableMapOf<Core, Float>()
         damages.forEach { (core, damage) ->
-            val last = lastSendDamage[core] ?: 0.0
-            if (last != damage) toSend[core] = damage
+            sendBlockDamage(core.blockLocation, damage)
         }
+    }
 
-        toSend.forEach { (core, damage) ->
+    // Bukkitのバグに強引に対処
+    private fun sendBlockDamage(location: Location, damage: Float) {
+        if (damage == 0.0F) {
             zombies.server.onlinePlayers.forEach {
-                it.sendBlockDamage(core.blockLocation, damage)
+                it as CraftPlayer
+                val packet = PacketPlayOutBlockBreakAnimation(
+                    it.handle.id,
+                    BlockPosition(location.blockX, location.blockY, location.blockZ),
+                    -1
+                )
+                it.handle.playerConnection!!.sendPacket(packet)
             }
-            lastSendDamage[core] = damage
+        } else {
+            zombies.server.onlinePlayers.forEach {
+                it.sendBlockDamage(location, damage)
+            }
         }
     }
 }

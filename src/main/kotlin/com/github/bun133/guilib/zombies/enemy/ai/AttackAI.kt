@@ -8,7 +8,7 @@ import net.minecraft.server.v1_16_R3.PathfinderGoal
 import java.util.*
 
 class AttackAI : AI<EntityCreature>(EntityCreature::class.java) {
-    override fun attach(entity: EntityCreature, plugin: Zombies) {
+    override fun abstractAttach(entity: EntityCreature, plugin: Zombies) {
         entity.targetSelector.a(0, TargetGoal(entity, 20.0) { true })
 
         entity.goalSelector.a(0, AttackTargetGoal(entity, 1.0, 20))
