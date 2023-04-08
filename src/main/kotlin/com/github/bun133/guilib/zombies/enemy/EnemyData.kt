@@ -2,8 +2,10 @@ package com.github.bun133.guilib.zombies.enemy
 
 import com.github.bun133.guilib.zombies.enemy.ai.AI
 import com.github.bun133.guilib.zombies.enemy.ai.TowerAttackAI
+import org.bukkit.NamespacedKey
 import org.bukkit.entity.Entity
 import org.bukkit.entity.EntityType
+import org.bukkit.persistence.PersistentDataType
 
 /**
  * 敵のデータ
@@ -44,11 +46,26 @@ enum class Enemy(val weight: Double, val data: EnemyData) {
     IronGolem(0.1, EnemyData.Simple(EntityType.IRON_GOLEM, 1000, 100.0, TowerAttackAI()));
 
     companion object {
+        private val key = NamespacedKey("zombies", "entitymarker")
+
+        // Entityにマーキングします
+        fun markDataTag(enemy: Enemy, entity: Entity) {
+            entity.persistentDataContainer.set(key, PersistentDataType.STRING, enemy.name)
+        }
+
+        private fun getDataTag(entity: Entity): String? {
+            return entity.persistentDataContainer.get(key, PersistentDataType.STRING)
+        }
+
         fun inferEnemy(entity: Entity): Enemy? {
-            // TODO More Specific
-            return values().find {
-                it.data.entityType == entity.type
+            val tag = getDataTag(entity)
+            val match = values().filter {
+                it.data.entityType == entity.type &&
+                        tag == it.name
             }
+
+            if (match.size == 1) return match[0]
+            return null
         }
     }
 }

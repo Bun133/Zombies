@@ -140,6 +140,8 @@ class SpawnHandler(val plugin: Zombies) : Listener {
 
         // Spawn
         val spawned = addEntity(created, loc.world)
+        // Marking
+        Enemy.markDataTag(enemy, spawned)
 
         when (enemyData) {
             is EnemyData.Normal -> {

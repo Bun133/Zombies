@@ -7,7 +7,6 @@ import java.util.*
 
 class SimpleAI : AI<EntityCreature>(EntityCreature::class.java) {
     override fun abstractAttach(entity: EntityCreature, plugin: Zombies) {
-        //TODO
         entity.targetSelector.a(0, TargetGoal(entity, 20.0) { true })
         entity.goalSelector.a(0, MoveTowardTargetGoal(entity))
     }
