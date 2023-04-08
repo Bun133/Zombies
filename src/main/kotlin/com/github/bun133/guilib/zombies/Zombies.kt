@@ -2,7 +2,6 @@ package com.github.bun133.guilib.zombies
 
 import com.github.bun133.guilib.zombies.bossbar.BossBarHandler
 import com.github.bun133.guilib.zombies.command.ZombiesCommand
-import com.github.bun133.guilib.zombies.core.Core
 import com.github.bun133.guilib.zombies.core.CoreHandler
 import com.github.bun133.guilib.zombies.enemy.AIHandler
 import com.github.bun133.guilib.zombies.enemy.KillHandler
@@ -11,6 +10,8 @@ import com.github.bun133.guilib.zombies.enemy.spawn.Waver
 import com.github.bun133.guilib.zombies.pop.PopHandler
 import com.github.bun133.guilib.zombies.trade.TraderHandler
 import net.kunmc.lab.commandlib.CommandLib
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.title.Title
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 
@@ -51,5 +52,25 @@ class Zombies : JavaPlugin() {
 
     private fun setUpCommands() {
         server.dispatchCommand(Bukkit.getConsoleSender(), "gamerule doMobSpawning false")
+    }
+
+    /**
+     * 現在進行中のゲームがプレイヤー側の敗北に終わった場合
+     */
+    fun onLose() {
+        server.onlinePlayers.forEach {
+            it.showTitle(Title.title(Component.text("敗北!"), Component.text("負けてしまった・・・")))
+            isWaveStarted = false
+        }
+    }
+
+    /**
+     * 現在進行中のゲームがプレイヤー側の勝利に終わった場合
+     */
+    fun onWin() {
+        server.onlinePlayers.forEach {
+            it.showTitle(Title.title(Component.text("勝利!"), Component.text("負けてしまった・・・")))
+            isWaveStarted = false
+        }
     }
 }
