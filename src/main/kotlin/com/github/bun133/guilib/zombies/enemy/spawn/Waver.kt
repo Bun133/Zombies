@@ -66,11 +66,10 @@ sealed class Wave {
 
     class BeforeGame : Wave() {
         override fun onStart(waver: Waver) {
-            waver.plugin.logger.info("Waver init")
         }
 
         override fun onEnd(waver: Waver, nextWave: Wave) {
-            waver.plugin.logger.info("Starting Game: Start Wave $nextWave")
+            waver.plugin.logger.info("Starting Game Wave")
         }
 
         override fun nextWave(): Wave = Wave.Attack(1)
@@ -82,7 +81,7 @@ sealed class Wave {
     class Attack(val wave: Int) : Wave() {
         override fun onStart(waver: Waver) {
             waver.plugin.config.lastWaveCount.value(wave)
-            waver.plugin.logger.info("New Wave:${wave} Started!")
+            waver.plugin.logger.info("Wave${wave} Started!")
 
             waver.plugin.server.onlinePlayers.forEach {
                 it.showTitle(
@@ -113,7 +112,7 @@ sealed class Wave {
         }
 
         override fun onEnd(waver: Waver, nextWave: Wave) {
-            waver.plugin.logger.info("Wave$wave is end. Next Wave is $nextWave")
+            waver.plugin.logger.info("Wave$wave is end")
         }
 
         override fun nextWave(): Wave {
@@ -128,12 +127,11 @@ sealed class Wave {
     class Prepare(val durationTick: Int, val waveTo: Int) : Wave() {
         var startServerTime: Int = Int.MAX_VALUE
         override fun onStart(waver: Waver) {
-            waver.plugin.logger.info("Prepare Time Started! Next Wave is Wave:$waveTo")
             startServerTime = waver.plugin.server.currentTick
         }
 
         override fun onEnd(waver: Waver, nextWave: Wave) {
-            waver.plugin.logger.info("Prepare Time is over! Next Wave is $nextWave")
+            waver.plugin.logger.info("Prepare Time is over!")
         }
 
         override fun nextWave(): Wave = Attack(waveTo)
