@@ -19,6 +19,12 @@ class BossHandler(val zombies: Zombies) {
         spawnBoss()
     }
 
+    fun resetBoss(){
+        isCompleted = false
+        currentBossType = null
+        bossEntity = null
+    }
+
     private fun spawnBoss() {
         val spawner = zombies.spawn.listActiveSpawner().randomOrNull()
         if (spawner == null) {

@@ -32,6 +32,7 @@ class Waver(internal val plugin: Zombies, internal val spawnHandler: SpawnHandle
         plugin.isWaveStarted = true
         plugin.core.resetCore()
         plugin.spawn.killAll()
+        plugin.boss.resetBoss()
         this.wave = Wave.BeforeGame
         nextWave()
     }

@@ -36,6 +36,11 @@ class KillHandler(plugin: Zombies) : Listener {
                 e.droppedExp = enemyData.dropExp
                 e.drops.clear()
             }
+
+            is EnemyData.Boss -> {
+                e.droppedExp = 0
+                e.drops.clear()
+            }
         }
     }
 }

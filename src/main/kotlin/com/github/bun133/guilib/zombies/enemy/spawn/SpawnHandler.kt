@@ -1,10 +1,13 @@
 package com.github.bun133.guilib.zombies.enemy.spawn
 
 import com.github.bun133.guilib.zombies.Zombies
+import com.github.bun133.guilib.zombies.enemy.BOSS_MARK
 import com.github.bun133.guilib.zombies.enemy.Enemy
 import com.github.bun133.guilib.zombies.enemy.EnemyData
 import com.github.bun133.guilib.zombies.randomize
+import net.minecraft.server.v1_16_R3.BossBattleServer
 import net.minecraft.server.v1_16_R3.EntityInsentient
+import net.minecraft.server.v1_16_R3.EntityWither
 import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.attribute.Attribute
@@ -90,13 +93,13 @@ class SpawnHandler(val plugin: Zombies) : Listener {
         var target = toSpawn
         val toSpawnEnemies = mutableListOf<Enemy>()
 
-        var possible = Enemy.values().filter { it.data.cost <= target }
+        var possible = Enemy.values().filter { it.data.cost <= target && it.data.cost != BOSS_MARK }
         while (possible.isNotEmpty()) {
             val chosen = randomPick(possible)
             target -= chosen.data.cost
             toSpawnEnemies.add(chosen)
 
-            possible = Enemy.values().filter { it.data.cost <= target }
+            possible = Enemy.values().filter { it.data.cost <= target&& it.data.cost != BOSS_MARK }
         }
 
         return toSpawnEnemies
@@ -139,6 +142,10 @@ class SpawnHandler(val plugin: Zombies) : Listener {
             is EnemyData.Simple -> {
                 createEntity(loc, enemyData.entityType.entityClass!!) as EntityInsentient
             }
+
+            is EnemyData.Boss -> {
+                spawnBoss(loc, enemy)
+            }
         }
 
         // setAI
@@ -163,6 +170,10 @@ class SpawnHandler(val plugin: Zombies) : Listener {
                     spawned.equipment!!.setItemInOffHand(null)
                 }
             }
+
+            is EnemyData.Boss -> {
+                // Nothing
+            }
         }
 
         enemies.add(enemy to spawned)
@@ -181,6 +192,22 @@ class SpawnHandler(val plugin: Zombies) : Listener {
         entity.equipment!!.setItemInOffHand(null)
 
         return entity
+    }
+
+    private fun spawnBoss(location: Location, enemy: Enemy): EntityInsentient {
+        val e = createEntity(location, enemy.data.entityType.entityClass!!)
+        val bossBar: BossBattleServer = when (enemy) {
+            Enemy.Wither -> {
+                (e as EntityWither).bossBattle
+            }
+
+            else -> throw NotImplementedError()
+        }
+
+        // バニラのボスバーが見えないように
+        bossBar.visible = false
+
+        return e
     }
 
     private fun <E : Entity> createEntity(loc: Location, clazz: Class<E>): net.minecraft.server.v1_16_R3.Entity {

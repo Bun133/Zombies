@@ -39,19 +39,25 @@ sealed class EnemyData {
         // 手に持ってるアイテムをクリアするフラッグ
         val itemClear: Boolean = true
     ) : EnemyData()
+
+    data class Boss(
+        override val entityType: EntityType,
+        override val ai: AI<*>,
+        override val cost: Double = BOSS_MARK    // Non Used
+    ) : EnemyData()
 }
 
 /**
  * ボスはEnemyに登録するが、普通に沸かないようにする
  */
-private const val BOSS_MARK = 0.0
+const val BOSS_MARK = Double.MAX_VALUE
 
 enum class Enemy(val weight: Double, val data: EnemyData) {
     Zombie(10.0, EnemyData.Simple(EntityType.ZOMBIE, 5, 1.0, TowerAttackAI())),
     Skeleton(1.0, EnemyData.Simple(EntityType.SKELETON, 10, 5.0, TowerAttackAI(), itemClear = false)),
     EnderMan(0.5, EnemyData.Simple(EntityType.ENDERMAN, 50, 10.0, TowerAttackAI())),
     IronGolem(0.1, EnemyData.Simple(EntityType.IRON_GOLEM, 1000, 100.0, TowerAttackAI())),
-    Wither(BOSS_MARK, EnemyData.Simple(EntityType.WITHER, 1000, 100.0, TowerAttackAI()));
+    Wither(BOSS_MARK, EnemyData.Boss(EntityType.WITHER, TowerAttackAI()));
 
     companion object {
         private val key = NamespacedKey("zombies", "entitymarker")
