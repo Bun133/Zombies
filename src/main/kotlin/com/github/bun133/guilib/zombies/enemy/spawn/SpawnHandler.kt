@@ -28,7 +28,7 @@ class SpawnHandler(val plugin: Zombies) : Listener {
     var targetSpawnCost: Double = plugin.config.initialSpawnCost.value()
         set(value) {
             field = value
-            plugin.config.lastTargetCost.value(value)
+            plugin.mConfig.lastTargetCost.value(value)
             plugin.logger.info("TargetSpawnCost Increased to ${value}")
         }
 
@@ -115,7 +115,7 @@ class SpawnHandler(val plugin: Zombies) : Listener {
 
     // 現在アクティブなスポナー
     fun listActiveSpawner(): List<Location> {
-        return plugin.config.spawnerLocationList.value().toList()
+        return plugin.mConfig.spawnerLocationList.value().toList()
     }
 
     @EventHandler

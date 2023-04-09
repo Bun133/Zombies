@@ -14,7 +14,7 @@ class TowerAttackAI : AI<EntityCreature>(EntityCreature::class.java) {
         }
         entity.goalSelector.a(
             5,
-            TowardLocationAI(entity, plugin.config.coreLocationList, plugin.config.coreBreakRange, 1.0)
+            TowardLocationAI(entity, plugin.mConfig.coreLocationList, plugin.config.coreBreakRange, 1.0)
         )
 
         if (entity is EntityZombie) {

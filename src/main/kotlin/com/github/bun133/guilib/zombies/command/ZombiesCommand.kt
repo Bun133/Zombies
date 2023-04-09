@@ -7,7 +7,7 @@ import net.kunmc.lab.configlib.ConfigCommandBuilder
 class ZombiesCommand(plugin: Zombies) : Command("zombies") {
     init {
         addChildren(
-            ConfigCommandBuilder(plugin.config).build(),
+            ConfigCommandBuilder(plugin.config).addConfig(plugin.mConfig).build(),
             TraderCommand(plugin),
             NextWaveCommand(plugin),
             CoreSetCommand(plugin),

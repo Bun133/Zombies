@@ -21,12 +21,11 @@ class CoreHandler(val zombies: Zombies) {
 
 
     val damages = mutableMapOf<Core, Float>()
-
     init {
-        zombies.config.coreLocationList.value().forEach {
+        zombies.mConfig.coreLocationList.value().forEach {
             damages[Core(it.toBlockLocation())] = 0.0F
         }
-        zombies.config.coreLocationList.onModify {
+        zombies.mConfig.coreLocationList.onModify {
             val alreadyExist = damages.map { d -> d.key.blockLocation }
             it.map { l -> l.toBlockLocation() }.filter { l -> l !in alreadyExist }.forEach { l ->
                 damages[Core(l)] = 0.0F

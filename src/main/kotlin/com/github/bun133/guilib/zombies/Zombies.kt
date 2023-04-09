@@ -17,6 +17,7 @@ import org.bukkit.plugin.java.JavaPlugin
 
 class Zombies : JavaPlugin() {
     lateinit var config: ZombiesConfig
+    lateinit var mConfig:ZombiesMinorConfig
     lateinit var ai: AIHandler
     lateinit var waver: Waver
     lateinit var spawn: SpawnHandler
@@ -33,6 +34,7 @@ class Zombies : JavaPlugin() {
         setUpCommands()
 
         config = ZombiesConfig(this)
+        mConfig = ZombiesMinorConfig(this)
         CommandLib.register(this, listOf(ZombiesCommand(this)))
 
         ai = AIHandler(this)

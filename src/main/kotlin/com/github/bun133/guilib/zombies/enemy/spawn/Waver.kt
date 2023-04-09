@@ -80,7 +80,7 @@ sealed class Wave {
 
     class Attack(val wave: Int) : Wave() {
         override fun onStart(waver: Waver) {
-            waver.plugin.config.lastWaveCount.value(wave)
+            waver.plugin.mConfig.lastWaveCount.value(wave)
             waver.plugin.logger.info("Wave${wave} Started!")
 
             waver.plugin.server.onlinePlayers.forEach {

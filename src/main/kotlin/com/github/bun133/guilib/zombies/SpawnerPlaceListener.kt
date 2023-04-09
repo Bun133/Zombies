@@ -15,7 +15,7 @@ class SpawnerPlaceListener(val plugin: Zombies) : Listener {
     @EventHandler
     fun onPlace(e: BlockPlaceEvent) {
         if (e.blockPlaced.type == Material.SPAWNER) {
-            plugin.config.spawnerLocationList.add(e.blockPlaced.location)
+            plugin.mConfig.spawnerLocationList.add(e.blockPlaced.location)
             e.player.sendMessage(Component.text("スポナーを登録しました"))
         }
     }
@@ -23,7 +23,7 @@ class SpawnerPlaceListener(val plugin: Zombies) : Listener {
     @EventHandler
     fun onBreak(e: BlockBreakEvent) {
         if (e.block.type == Material.SPAWNER) {
-            plugin.config.spawnerLocationList.remove(e.block.location)
+            plugin.mConfig.spawnerLocationList.remove(e.block.location)
             e.player.sendMessage(Component.text("スポナーを登録解除しました"))
         }
     }

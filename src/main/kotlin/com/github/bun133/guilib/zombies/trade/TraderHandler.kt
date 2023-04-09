@@ -26,14 +26,14 @@ class TraderHandler(private val plugin: Zombies) : Listener {
 
     fun register(trader: Trader) {
         traders.add(trader)
-        plugin.config.traderLocationList.add(trader.entity.location)
+        plugin.mConfig.traderLocationList.add(trader.entity.location)
     }
 
     init {
         plugin.server.pluginManager.registerEvents(this, plugin)
 
         plugin.server.scheduler.runTaskLater(plugin, Runnable {
-            plugin.config.traderLocationList.toList().forEach {
+            plugin.mConfig.traderLocationList.toList().forEach {
                 it.getNearbyEntitiesByType(Villager::class.java, 1.0).forEach { v ->
                     v.remove()
                 }
