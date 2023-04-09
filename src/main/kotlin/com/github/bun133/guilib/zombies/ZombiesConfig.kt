@@ -4,10 +4,15 @@ import net.kunmc.lab.configlib.BaseConfig
 import net.kunmc.lab.configlib.value.DoubleValue
 import net.kunmc.lab.configlib.value.FloatValue
 import net.kunmc.lab.configlib.value.IntegerValue
+import net.kunmc.lab.configlib.value.MaterialValue
 import net.kunmc.lab.configlib.value.collection.LocationSetValue
+import org.bukkit.Material
 import org.bukkit.plugin.java.JavaPlugin
 
 class ZombiesConfig(plugin: JavaPlugin) : BaseConfig(plugin) {
+    // コアのブロック
+    val coreBlock = MaterialValue(Material.BEACON)
+
     // Coreを破壊できる範囲
     val coreBreakRange = DoubleValue(1.5)
 

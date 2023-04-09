@@ -19,8 +19,9 @@ class CoreHandler(val zombies: Zombies) {
         zombies.server.scheduler.runTaskTimer(zombies, Runnable { update() }, 0L, 20L)
     }
 
-
+    fun aliveCore() = damages.filterValues { it < 1.0F }.keys
     val damages = mutableMapOf<Core, Float>()
+
     init {
         zombies.mConfig.coreLocationList.value().forEach {
             damages[Core(it.toBlockLocation())] = 0.0F
@@ -36,8 +37,13 @@ class CoreHandler(val zombies: Zombies) {
     /**
      * コアのダメージをリセットします
      */
-    fun resetCoreDamages() {
+    fun resetCore() {
         damages.replaceAll { _, _ -> 0.0F }
+        damages.keys.forEach {
+            // ブロックの復活
+            it.blockLocation.block.type = zombies.config.coreBlock.value()
+        }
+        loseFlag = false
     }
 
     private fun update() {
@@ -45,8 +51,10 @@ class CoreHandler(val zombies: Zombies) {
         updateBlockBreak()
     }
 
+    private var loseFlag = false
+
     private fun updateDamage() {
-        damages.keys.forEach { c ->
+        damages.filterValues { it < 1.0F }.keys.forEach { c ->
             val nearBy = c.blockLocation.getNearbyEntities(
                 zombies.config.coreBreakRange.value(),
                 zombies.config.coreBreakRange.value(),
@@ -63,10 +71,12 @@ class CoreHandler(val zombies: Zombies) {
             if (damages[c]!! >= 1.0F) {
                 damages[c] = 1.0F
                 c.blockLocation.block.type = Material.AIR
-                if (damages.isEmpty()) {
-                    zombies.onLose()
-                }
             }
+        }
+
+        if (damages.isNotEmpty() && damages.filterValues { it < 1.0F }.isEmpty() && !loseFlag) {
+            zombies.onLose()
+            loseFlag = true
         }
     }
 
