@@ -14,7 +14,6 @@ class CoreSetCommand(plugin: Zombies) : Command("core") {
             if (loc.block.type == Material.AIR) {
                 ctx.sendFailure("ブロックを指定してください")
             } else {
-                plugin.config.targetLocation.value(loc)
                 plugin.config.coreLocationList.clear()
                 plugin.config.coreLocationList.add(loc)
                 ctx.sendSuccess("Coreを変更しました")

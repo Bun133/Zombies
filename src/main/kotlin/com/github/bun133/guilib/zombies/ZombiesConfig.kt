@@ -39,7 +39,4 @@ class ZombiesConfig(plugin: JavaPlugin) : BaseConfig(plugin) {
     // なお、自動復旧機能はありません、コマンドをご利用ください
     val lastTargetCost = DoubleValue(10.0)
     val lastWaveCount = IntegerValue(0)
-
-    // Target Location
-    val targetLocation = LocationValue()
 }
