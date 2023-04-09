@@ -35,6 +35,13 @@ class PopHandler(private val plugin: Zombies) : Listener {
                     val blockFace = velocityToDirection(e.entity.velocity)
                     val player = e.entity.shooter as? Player
                     if (player != null) {
+                        if (e.hitBlock!!.type != plugin.config.popSurface.value()) {
+                            // 使えない範囲で使っている
+                            player.sendMessage(Component.text("ここでは使えません").color(NamedTextColor.RED))
+                            player.inventory.addItem(pop.item.clone())
+                            return
+                        }
+
                         val b = pop.onPop(e.hitBlock!!.location.clone().add(0.0, 1.0, 0.0), blockFace, player)
                         if (b) {
                             player.sendMessage(Component.text("展開しました").color(NamedTextColor.GREEN))

@@ -28,6 +28,9 @@ class ZombiesConfig(plugin: JavaPlugin) : BaseConfig(plugin) {
     // 次のWaveはTargetSpawnCostを[increaseFactor]倍される
     val waveCheckInterval = IntegerValue(20 * 1)
     val increaseFactor = DoubleValue(1.1)
+
+    // Popが使える場所の地面のブロック
+    val popSurface = MaterialValue(Material.GRASS_BLOCK)
 }
 
 /**
