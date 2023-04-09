@@ -31,6 +31,9 @@ class ZombiesConfig(plugin: JavaPlugin) : BaseConfig(plugin) {
 
     // Popが使える場所の地面のブロック
     val popSurface = MaterialValue(Material.GRASS_BLOCK)
+
+    // ラスボスが襲来してくるウェーブ
+    val bossWave = IntegerValue(30)
 }
 
 /**

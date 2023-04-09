@@ -14,6 +14,7 @@ class BossBarHandler(private val plugin: Zombies) {
     }
 
     private val waveBossBarKey = NamespacedKey(plugin, "bossbar")
+    private val bossBossBarKey = NamespacedKey(plugin, "boss")
     private fun getBossBar(key: NamespacedKey, default: String): KeyedBossBar {
         return plugin.server.getBossBar(key) ?: plugin.server.createBossBar(
             key,
@@ -31,28 +32,36 @@ class BossBarHandler(private val plugin: Zombies) {
     }
 
     private fun updateWaveBossBar() {
-        val bar = getBossBar(waveBossBarKey, "残りの敵")
+        val waveBar = getBossBar(waveBossBarKey, "残りの敵")
+        val bossBar = getBossBar(bossBossBarKey, "ボスの体力")
+
         if (!plugin.isWaveStarted) {
-            bar.isVisible = false
+            waveBar.isVisible = false
+            bossBar.isVisible = false
         } else {
             val wave = plugin.waver.wave
             when (wave) {
                 is Wave.BeforeGame -> {
                     // Hide
-                    bar.isVisible = false
+                    waveBar.isVisible = false
+                    bossBar.isVisible = false
                 }
 
                 is Wave.Attack -> {
+                    bossBar.isVisible = false
+
                     val target = plugin.spawn.targetSpawnCost
                     val remain = plugin.spawn.getPresentCost()
                     val progress = min(1.0, max(remain / target, 0.0))
-                    bar.setTitle("ウェーブ${wave.wave} 残りの敵")
-                    bar.progress = progress
-                    bar.isVisible = true
-                    showToAll(bar)
+                    waveBar.setTitle("ウェーブ${wave.wave} 残りの敵")
+                    waveBar.progress = progress
+                    waveBar.isVisible = true
+                    showToAll(waveBar)
                 }
 
                 is Wave.Prepare -> {
+                    bossBar.isVisible = false
+
                     val remain = max(wave.durationTick - (plugin.server.currentTick - wave.startServerTime), 0)
 
                     val progress =
@@ -64,10 +73,31 @@ class BossBarHandler(private val plugin: Zombies) {
                             )
                         )
 
-                    bar.setTitle("準備フェーズ 残り${remain / 20}秒")
-                    bar.progress = progress
-                    bar.isVisible = true
-                    showToAll(bar)
+                    waveBar.setTitle("準備フェーズ 残り${remain / 20}秒")
+                    waveBar.progress = progress
+                    waveBar.isVisible = true
+                    showToAll(waveBar)
+                }
+
+                is Wave.BossWave -> {
+                    waveBar.isVisible = false
+
+                    val e = plugin.boss.bossEntity
+                    if (e != null) {
+                        bossBar.isVisible = true
+                        showToAll(bossBar)
+                        val progress =
+                            e.health / e.getAttribute(org.bukkit.attribute.Attribute.GENERIC_MAX_HEALTH)!!.value
+                        bossBar.progress = progress
+                        if (plugin.boss.currentBossType != null) {
+                            bossBar.setTitle("${plugin.boss.currentBossType!!.data.displayName}の体力")
+                            bossBar.color = plugin.boss.currentBossType!!.data.bossBarColor
+                        } else {
+                            bossBar.color = BarColor.WHITE
+                        }
+                    } else {
+                        bossBar.isVisible = false
+                    }
                 }
             }
 

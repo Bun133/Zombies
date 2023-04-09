@@ -5,6 +5,7 @@ import com.github.bun133.guilib.zombies.command.ZombiesCommand
 import com.github.bun133.guilib.zombies.core.CoreHandler
 import com.github.bun133.guilib.zombies.enemy.AIHandler
 import com.github.bun133.guilib.zombies.enemy.KillHandler
+import com.github.bun133.guilib.zombies.enemy.boss.BossHandler
 import com.github.bun133.guilib.zombies.enemy.spawn.SpawnHandler
 import com.github.bun133.guilib.zombies.enemy.spawn.Waver
 import com.github.bun133.guilib.zombies.pop.PopHandler
@@ -21,6 +22,7 @@ class Zombies : JavaPlugin() {
     lateinit var ai: AIHandler
     lateinit var waver: Waver
     lateinit var spawn: SpawnHandler
+    lateinit var boss:BossHandler
     lateinit var kill: KillHandler
     lateinit var pop: PopHandler
     lateinit var trader: TraderHandler
@@ -39,6 +41,7 @@ class Zombies : JavaPlugin() {
 
         ai = AIHandler(this)
         spawn = SpawnHandler(this)
+        boss = BossHandler(this)
         waver = Waver(this, spawn)
         kill = KillHandler(this)
         pop = PopHandler(this)
@@ -62,8 +65,8 @@ class Zombies : JavaPlugin() {
     fun onLose() {
         server.onlinePlayers.forEach {
             it.showTitle(Title.title(Component.text("敗北!"), Component.text("負けてしまった・・・")))
-            isWaveStarted = false
         }
+        waver.endGame()
     }
 
     /**
@@ -71,8 +74,9 @@ class Zombies : JavaPlugin() {
      */
     fun onWin() {
         server.onlinePlayers.forEach {
-            it.showTitle(Title.title(Component.text("勝利!"), Component.text("負けてしまった・・・")))
+            it.showTitle(Title.title(Component.text("勝利!"), Component.text("勝ったぞ！！！！")))
             isWaveStarted = false
         }
+        waver.endGame()
     }
 }

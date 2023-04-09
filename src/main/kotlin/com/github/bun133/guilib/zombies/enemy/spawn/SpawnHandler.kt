@@ -33,6 +33,15 @@ class SpawnHandler(val plugin: Zombies) : Listener {
         }
 
     /**
+     * 場に出ている敵を一掃する
+     */
+    fun killAll() {
+        enemies.forEach { (en, entity) ->
+            entity.remove()
+        }
+    }
+
+    /**
      * 場に出ている敵の合計Cost
      */
     internal fun getPresentCost(): Double {
@@ -123,7 +132,7 @@ class SpawnHandler(val plugin: Zombies) : Listener {
         e.isCancelled = true
     }
 
-    fun spawnEnemy(enemy: Enemy, loc: Location) {
+    fun spawnEnemy(enemy: Enemy, loc: Location): LivingEntity {
         val enemyData = enemy.data
         val created = when (enemyData) {
             is EnemyData.Normal,
@@ -157,6 +166,7 @@ class SpawnHandler(val plugin: Zombies) : Listener {
         }
 
         enemies.add(enemy to spawned)
+        return spawned
     }
 
     private fun handleNormal(data: EnemyData.Normal, entity: LivingEntity): LivingEntity {

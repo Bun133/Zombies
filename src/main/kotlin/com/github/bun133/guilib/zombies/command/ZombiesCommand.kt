@@ -12,7 +12,8 @@ class ZombiesCommand(plugin: Zombies) : Command("zombies") {
             NextWaveCommand(plugin),
             CoreCommand(plugin),
             StartCommand(plugin),
-            EndCommand(plugin)
+            EndCommand(plugin),
+            BossCommand(plugin)
         )
     }
 }

@@ -31,23 +31,27 @@ class Waver(internal val plugin: Zombies, internal val spawnHandler: SpawnHandle
     fun startGame() {
         plugin.isWaveStarted = true
         plugin.core.resetCore()
-        this.wave = Wave.BeforeGame()
+        plugin.spawn.killAll()
+        this.wave = Wave.BeforeGame
         nextWave()
     }
 
     fun endGame() {
         plugin.isWaveStarted = false
-        this.wave = Wave.BeforeGame()
+        this.wave = Wave.BeforeGame
     }
 
-    var wave: Wave = Wave.BeforeGame()
+    var wave: Wave = Wave.BeforeGame
+        set(value) {
+            field.onEnd(this, value)
+            field = value
+            value.onStart(this)
+        }
 
     fun nextWave() {
         if (!plugin.isWaveStarted) return
-        val next = wave.nextWave()
-        wave.onEnd(this, next)
+        val next = wave.nextWave(this)
         wave = next
-        wave.onStart(this)
     }
 
     private fun checkNextWave() {
@@ -61,10 +65,10 @@ class Waver(internal val plugin: Zombies, internal val spawnHandler: SpawnHandle
 sealed class Wave {
     abstract fun onStart(waver: Waver)
     abstract fun onEnd(waver: Waver, nextWave: Wave)
-    abstract fun nextWave(): Wave
+    abstract fun nextWave(waver: Waver): Wave
     abstract fun waveCompleted(waver: Waver): Boolean
 
-    class BeforeGame : Wave() {
+    object BeforeGame : Wave() {
         override fun onStart(waver: Waver) {
         }
 
@@ -72,7 +76,7 @@ sealed class Wave {
             waver.plugin.logger.info("Starting Game Wave")
         }
 
-        override fun nextWave(): Wave = Wave.Attack(1)
+        override fun nextWave(waver: Waver): Wave = Wave.Attack(1)
         override fun waveCompleted(waver: Waver): Boolean {
             return waver.plugin.isWaveStarted
         }
@@ -115,7 +119,7 @@ sealed class Wave {
             waver.plugin.logger.info("Wave$wave is end")
         }
 
-        override fun nextWave(): Wave {
+        override fun nextWave(waver: Waver): Wave {
             return Prepare(20 * 30, wave + 1)
         }
 
@@ -134,9 +138,33 @@ sealed class Wave {
             waver.plugin.logger.info("Prepare Time is over!")
         }
 
-        override fun nextWave(): Wave = Attack(waveTo)
+        override fun nextWave(waver: Waver): Wave {
+            return if (waver.plugin.config.bossWave.value() == waveTo) {
+                BossWave
+            } else {
+                Attack(waveTo)
+            }
+        }
+
         override fun waveCompleted(waver: Waver): Boolean {
             return waver.plugin.server.currentTick >= startServerTime + durationTick
         }
+    }
+
+    object BossWave : Wave() {
+        override fun onStart(waver: Waver) {
+            waver.plugin.boss.startBossWave()
+        }
+
+        override fun onEnd(waver: Waver, nextWave: Wave) {
+            waver.plugin.logger.info("BossWave End!")
+        }
+
+        override fun nextWave(waver: Waver): Wave {
+            waver.endGame()
+            return BeforeGame
+        }
+
+        override fun waveCompleted(waver: Waver): Boolean = waver.plugin.boss.bossWaveCompleted()
     }
 }
