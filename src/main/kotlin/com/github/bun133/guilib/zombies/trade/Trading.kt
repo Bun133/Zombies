@@ -6,6 +6,9 @@ import net.kyori.adventure.text.Component
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.meta.PotionMeta
+import org.bukkit.potion.PotionEffect
+import org.bukkit.potion.PotionEffectType
 
 /**
  * 取引
@@ -88,6 +91,39 @@ val tradings = mutableListOf(
         ItemStack(Material.LEATHER_LEGGINGS),
         ItemStack(Material.LEATHER_BOOTS),
     ).toTypedArray(),
+    *trade(
+        2,
+        arrayOf("硬い。").textComponent(),
+        null,
+        ItemStack(Material.IRON_HELMET),
+        ItemStack(Material.IRON_CHESTPLATE),
+        ItemStack(Material.IRON_LEGGINGS),
+        ItemStack(Material.IRON_BOOTS),
+    ).toTypedArray(),
+    *trade(
+        5,
+        arrayOf("ピカピカ！").textComponent(),
+        null,
+        ItemStack(Material.DIAMOND_HELMET),
+        ItemStack(Material.DIAMOND_CHESTPLATE),
+        ItemStack(Material.DIAMOND_LEGGINGS),
+        ItemStack(Material.DIAMOND_BOOTS),
+    ).toTypedArray(),
+    *trade(
+        10,
+        arrayOf("カチコチ").textComponent(),
+        null,
+        ItemStack(Material.NETHERITE_HELMET),
+        ItemStack(Material.NETHERITE_CHESTPLATE),
+        ItemStack(Material.NETHERITE_LEGGINGS),
+        ItemStack(Material.NETHERITE_BOOTS),
+    ).toTypedArray(),
+    trade(3, arrayOf("万が一のために").textComponent(), Component.text("回復のポーション"), ItemStack(Material.POTION).apply {
+        editMeta {
+            it as PotionMeta
+            it.addCustomEffect(PotionEffect(PotionEffectType.HEAL, 10, 1), false)
+        }
+    }),
     trade(
         popInstantTower,
         arrayOf("きっと役に立つ").textComponent(),
