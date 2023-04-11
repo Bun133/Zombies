@@ -13,7 +13,8 @@ class ZombiesCommand(plugin: Zombies) : Command("zombies") {
             CoreCommand(plugin),
             StartCommand(plugin),
             EndCommand(plugin),
-            BossCommand(plugin)
+            BossCommand(plugin),
+            RespawnCommand(plugin)
         )
     }
 }

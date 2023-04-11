@@ -34,6 +34,9 @@ class ZombiesConfig(plugin: JavaPlugin) : BaseConfig(plugin) {
 
     // ラスボスが襲来してくるウェーブ
     val bossWave = IntegerValue(30)
+
+    // リスポーンの間隔
+    val respawnTime = IntegerValue(20 * 30)
 }
 
 /**
