@@ -7,6 +7,8 @@ import com.github.bun133.guifly.gui.type.InventoryType
 import com.github.bun133.guifly.title
 import com.github.bun133.guifly.type
 import com.github.bun133.guilib.zombies.Zombies
+import com.github.bun133.guilib.zombies.notice
+import com.github.bun133.guilib.zombies.noticeWarn
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.GameMode
@@ -61,10 +63,11 @@ class TraderHandler(private val plugin: Zombies) : Listener {
             if (player.level >= trading.level) {
                 // Affordable
                 player.giveExpLevels(-trading.level)
+                player.notice(Component.text("購入しました").color(NamedTextColor.GREEN))
                 trading.onBuy(player)
             } else {
                 // Cant Afford
-                player.sendMessage(Component.text("レベルが足りません！").color(NamedTextColor.RED))
+                player.noticeWarn(Component.text("レベルが足りません！").color(NamedTextColor.RED))
                 player.playNote(
                     player.location,
                     Instrument.PLING,

@@ -27,7 +27,7 @@ data class Trading(
 /**
  * 村人の取引一覧
  */
-val tradings = mutableListOf(
+val tradings = mutableListOf<Trading>(
     trade(
         ItemStack(Material.WOODEN_SWORD),
         null,
@@ -118,12 +118,14 @@ val tradings = mutableListOf(
         ItemStack(Material.NETHERITE_LEGGINGS),
         ItemStack(Material.NETHERITE_BOOTS),
     ).toTypedArray(),
-    trade(3, arrayOf("万が一のために").textComponent(), Component.text("回復のポーション"), ItemStack(Material.POTION).apply {
-        editMeta {
-            it as PotionMeta
-            it.addCustomEffect(PotionEffect(PotionEffectType.HEAL, 10, 1), false)
-        }
-    }),
+    trade(
+        ItemStack(Material.POTION).apply {
+            editMeta {
+                it as PotionMeta
+                it.addCustomEffect(PotionEffect(PotionEffectType.HEAL, 10, 1), false)
+            }
+        }, name = Component.text("回復のポーション"), arrayOf("万が一のために").textComponent(), 3
+    ),
     trade(
         popInstantTower,
         arrayOf("きっと役に立つ").textComponent(),

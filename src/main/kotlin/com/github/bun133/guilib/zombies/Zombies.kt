@@ -9,6 +9,7 @@ import com.github.bun133.guilib.zombies.enemy.boss.BossHandler
 import com.github.bun133.guilib.zombies.enemy.spawn.SpawnHandler
 import com.github.bun133.guilib.zombies.enemy.spawn.Waver
 import com.github.bun133.guilib.zombies.pop.PopHandler
+import com.github.bun133.guilib.zombies.respawn.RespawnHandler
 import com.github.bun133.guilib.zombies.trade.TraderHandler
 import net.kunmc.lab.commandlib.CommandLib
 import net.kyori.adventure.text.Component
@@ -19,6 +20,7 @@ import org.bukkit.plugin.java.JavaPlugin
 class Zombies : JavaPlugin() {
     lateinit var config: ZombiesConfig
     lateinit var mConfig:ZombiesMinorConfig
+    lateinit var respawn: RespawnHandler
     lateinit var ai: AIHandler
     lateinit var waver: Waver
     lateinit var spawn: SpawnHandler
@@ -37,6 +39,7 @@ class Zombies : JavaPlugin() {
 
         config = ZombiesConfig(this)
         mConfig = ZombiesMinorConfig(this)
+        respawn = RespawnHandler(this)
         CommandLib.register(this, listOf(ZombiesCommand(this)))
 
         ai = AIHandler(this)

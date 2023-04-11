@@ -1,6 +1,8 @@
 package com.github.bun133.guilib.zombies.pop
 
 import com.github.bun133.guilib.zombies.Zombies
+import com.github.bun133.guilib.zombies.notice
+import com.github.bun133.guilib.zombies.noticeWarn
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Location
@@ -37,16 +39,16 @@ class PopHandler(private val plugin: Zombies) : Listener {
                     if (player != null) {
                         if (e.hitBlock!!.type != plugin.config.popSurface.value()) {
                             // 使えない範囲で使っている
-                            player.sendMessage(Component.text("ここでは使えません").color(NamedTextColor.RED))
+                            player.noticeWarn(Component.text("ここでは使えません").color(NamedTextColor.RED))
                             player.inventory.addItem(pop.item.clone())
                             return
                         }
 
                         val b = pop.onPop(e.hitBlock!!.location.clone().add(0.0, 1.0, 0.0), blockFace, player)
                         if (b) {
-                            player.sendMessage(Component.text("展開しました").color(NamedTextColor.GREEN))
+                            player.notice(Component.text("展開しました").color(NamedTextColor.GREEN))
                         } else {
-                            player.sendMessage(Component.text("障害物に当たったため展開を中断します").color(NamedTextColor.RED))
+                            player.noticeWarn(Component.text("障害物に当たったため展開を中断します").color(NamedTextColor.RED))
                             player.inventory.addItem(pop.item.clone())
                         }
                     } else {
@@ -59,7 +61,7 @@ class PopHandler(private val plugin: Zombies) : Listener {
                     val player = e.entity.shooter as? Player
                     if (player != null) {
                         player.inventory.addItem(pop.item.clone())
-                        player.sendMessage(Component.text("展開できませんでした").color(NamedTextColor.RED))
+                        player.noticeWarn(Component.text("展開できませんでした").color(NamedTextColor.RED))
                     } else {
                         plugin.logger.warning("Non Player Snowball")
                     }

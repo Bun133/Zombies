@@ -1,6 +1,7 @@
 package com.github.bun133.guilib.zombies.command
 
 import com.github.bun133.guilib.zombies.Zombies
+import com.github.bun133.guilib.zombies.notice
 import com.github.bun133.guilib.zombies.trade.Trader
 import com.github.bun133.guilib.zombies.trade.tradings
 import net.kunmc.lab.commandlib.Command
@@ -34,7 +35,7 @@ class TraderCommand(val plugin: Zombies) : Command("trader"), Listener {
 
             players.remove(e.player)
 
-            e.player.sendMessage(Component.text("設定完了しました！").color(NamedTextColor.GREEN))
+            e.player.notice(Component.text("設定完了しました！").color(NamedTextColor.GREEN))
         }
     }
 }
